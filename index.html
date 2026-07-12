@@ -34,7 +34,10 @@
     color:var(--ink);
     -webkit-font-smoothing:antialiased;
   }
-  h1,h2,h3,.brand-script{font-family:'Playfair Display',serif;}
+  h2,h3{font-family:'Playfair Display',serif;}
+  .brand h1,.brand .brand-script{
+    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
   ::selection{background:var(--teal-light);}
   button{font-family:'Poppins',sans-serif;cursor:pointer;}
   input,select,textarea{font-family:'Poppins',sans-serif;}
@@ -61,18 +64,29 @@
     padding-bottom:18px;
     border-bottom:1px solid rgba(255,255,255,0.25);
   }
+  .brand-logo{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    object-fit:cover;
+    margin:0 auto 12px;
+    display:block;
+    box-shadow:0 4px 14px rgba(0,0,0,0.18);
+    background:#fff;
+  }
   .brand h1{
-    font-size:26px;
+    font-size:23px;
     margin:0;
-    letter-spacing:0.5px;
+    font-weight:600;
+    letter-spacing:-0.2px;
   }
   .brand .brand-script{
-    font-style:italic;
-    font-weight:500;
-    font-size:14px;
-    opacity:0.9;
+    font-weight:400;
+    font-size:13px;
+    opacity:0.88;
     display:block;
-    margin-top:2px;
+    margin-top:3px;
+    letter-spacing:0.1px;
   }
   nav.tabs{
     display:flex;
@@ -353,6 +367,7 @@
 <div class="app">
   <aside class="sidebar">
     <div class="brand">
+      <img class="brand-logo" id="brandLogo" src="logo.png" alt="Cejas Lovely" onerror="this.replaceWith(fallbackLogoSVG())">
       <h1>Cejas Lovely</h1>
       <span class="brand-script">Panel Administrativo</span>
     </div>
@@ -619,6 +634,34 @@
    ========================================================= */
 
 const STORAGE_KEY = 'cejasLovelyData_v1';
+
+function fallbackLogoSVG(){
+  const div = document.createElement('div');
+  div.className = 'brand-logo';
+  div.style.overflow = 'hidden';
+  div.innerHTML = `
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cejas Lovely" width="100%" height="100%">
+      <defs>
+        <radialGradient id="logoGrad" cx="50%" cy="42%" r="72%">
+          <stop offset="0%" stop-color="#f3fffb"/>
+          <stop offset="55%" stop-color="#7fe0cf"/>
+          <stop offset="100%" stop-color="#12796b"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="49" fill="url(#logoGrad)"/>
+      <g stroke="#1b1f1e" stroke-width="1.6" fill="none" stroke-linecap="round">
+        <path d="M14,44 Q26,30 40,36"/>
+        <path d="M13,52 Q27,46 42,49"/>
+        <path d="M13,52 L9,49 M17,54 L13,52 M22,55.5 L19,54 M28,56.5 L26,55.5 M35,57 L33,56.5 M42,49 L46,50" stroke-width="1.3"/>
+        <path d="M16,55 Q27,60 38,55" stroke-width="1.2" opacity="0.6"/>
+        <path d="M86,44 Q74,30 60,36"/>
+        <path d="M87,52 Q73,46 58,49"/>
+        <path d="M87,52 L91,49 M83,54 L87,52 M78,55.5 L81,54 M72,56.5 L74,55.5 M65,57 L67,56.5 M58,49 L54,50" stroke-width="1.3"/>
+        <path d="M84,55 Q73,60 62,55" stroke-width="1.2" opacity="0.6"/>
+      </g>
+    </svg>`;
+  return div;
+}
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 function todayISO(){ return new Date().toISOString().slice(0,10); }
