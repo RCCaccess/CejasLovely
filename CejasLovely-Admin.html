@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cejas Lovely · Panel Administrativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --teal-dark:#0e7a6b;
+    --teal:#22a893;
+    --teal-mid:#4dc4ae;
+    --teal-light:#a9ecdd;
+    --mint:#eefdf9;
+    --ink:#1b1f1e;
+    --gray:#6b7573;
+    --gray-light:#9aa5a2;
+    --line:#e3efec;
+    --white:#ffffff;
+    --danger:#c0554d;
+    --danger-light:#fbe9e7;
+    --gold:#c9a227;
+    --shadow:0 8px 24px rgba(14,122,107,0.10);
+    --shadow-sm:0 2px 8px rgba(14,122,107,0.08);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  html,body{
+    font-family:'Poppins',sans-serif;
+    background:var(--mint);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.brand-script{font-family:'Playfair Display',serif;}
+  ::selection{background:var(--teal-light);}
+  button{font-family:'Poppins',sans-serif;cursor:pointer;}
+  input,select,textarea{font-family:'Poppins',sans-serif;}
+
+  /* ---------- LAYOUT ---------- */
+  .app{
+    display:grid;
+    grid-template-columns:250px 1fr;
+    min-height:100vh;
+  }
+  .sidebar{
+    background:linear-gradient(160deg,var(--teal-dark),var(--teal) 60%,var(--teal-mid));
+    color:#fff;
+    padding:28px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:26px;
+    position:sticky;
+    top:0;
+    height:100vh;
+  }
+  .brand{
+    text-align:center;
+    padding-bottom:18px;
+    border-bottom:1px solid rgba(255,255,255,0.25);
+  }
+  .brand h1{
+    font-size:26px;
+    margin:0;
+    letter-spacing:0.5px;
+  }
+  .brand .brand-script{
+    font-style:italic;
+    font-weight:500;
+    font-size:14px;
+    opacity:0.9;
+    display:block;
+    margin-top:2px;
+  }
+  nav.tabs{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex:1;
+  }
+  nav.tabs button{
+    background:transparent;
+    border:none;
+    color:#fff;
+    text-align:left;
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:14.5px;
+    font-weight:500;
+    opacity:0.85;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    transition:all .15s ease;
+  }
+  nav.tabs button:hover{opacity:1;background:rgba(255,255,255,0.12);}
+  nav.tabs button.active{
+    opacity:1;
+    background:rgba(255,255,255,0.22);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.3);
+  }
+  .sidebar-footer{
+    font-size:11.5px;
+    opacity:0.75;
+    text-align:center;
+    line-height:1.5;
+  }
+
+  main{
+    padding:32px 40px 60px;
+    max-width:1200px;
+    width:100%;
+  }
+  .view{display:none;}
+  .view.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:24px;
+  }
+  .page-header h2{font-size:26px;margin:0 0 4px;}
+  .page-header p{margin:0;color:var(--gray);font-size:13.5px;}
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:var(--white);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+    padding:22px;
+    border:1px solid var(--line);
+  }
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:16px;
+    margin-bottom:22px;
+  }
+  .stat-card{
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--shadow-sm);
+    border:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .stat-card::before{
+    content:'';
+    position:absolute;top:0;left:0;height:100%;width:4px;
+    background:var(--teal);
+  }
+  .stat-card.expense::before{background:var(--danger);}
+  .stat-card .label{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:0.6px;}
+  .stat-card .value{font-size:25px;font-weight:600;margin-top:6px;color:var(--ink);}
+  .stat-card.expense .value{color:var(--danger);}
+  .stat-card.profit .value{color:var(--teal-dark);}
+
+  .period-toggle{
+    display:inline-flex;
+    background:var(--white);
+    border-radius:10px;
+    padding:4px;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-sm);
+  }
+  .period-toggle button{
+    border:none;background:transparent;padding:8px 16px;border-radius:8px;
+    font-size:13px;font-weight:500;color:var(--gray);
+  }
+  .period-toggle button.active{background:var(--teal);color:#fff;}
+
+  .chart-grid{
+    display:grid;
+    grid-template-columns:1.5fr 1fr 1fr;
+    gap:18px;
+    margin-top:20px;
+  }
+  .chart-card h3{font-size:15px;margin:0 0 14px;color:var(--ink);}
+  .chart-card{min-height:280px;}
+
+  @media(max-width:980px){
+    .chart-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- FORMS ---------- */
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:14px;
+  }
+  label{
+    font-size:12px;
+    color:var(--gray);
+    font-weight:500;
+    display:block;
+    margin-bottom:5px;
+  }
+  input,select,textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:14px;
+    color:var(--ink);
+    background:#fbfffe;
+    outline:none;
+    transition:border .15s;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--teal);}
+  .btn{
+    border:none;
+    padding:11px 22px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:600;
+    color:#fff;
+    background:var(--teal);
+    box-shadow:0 4px 12px rgba(34,168,147,0.28);
+  }
+  .btn:hover{background:var(--teal-dark);}
+  .btn.danger{background:var(--danger);box-shadow:0 4px 12px rgba(192,85,77,0.25);}
+  .btn.danger:hover{background:#a8443d;}
+  .btn.ghost{
+    background:transparent;color:var(--teal-dark);
+    border:1px solid var(--teal-light);box-shadow:none;
+  }
+  .btn.ghost:hover{background:var(--teal-light);}
+  .btn.small{padding:6px 12px;font-size:12.5px;border-radius:8px;}
+  .btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+
+  .tab-switch{display:flex;gap:8px;margin-bottom:18px;}
+  .tab-switch button{
+    padding:9px 18px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;font-size:13.5px;font-weight:500;color:var(--gray);
+  }
+  .tab-switch button.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .tab-switch button.expense-tab.active{background:var(--danger);border-color:var(--danger);}
+
+  /* ---------- TABLE ---------- */
+  table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);}
+  th{color:var(--gray);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:0.4px;}
+  tr:hover td{background:#f7fffd;}
+  .pill{
+    display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;
+  }
+  .pill.cejas{background:#e6f7f2;color:var(--teal-dark);}
+  .pill.estilista{background:#fdeee0;color:#b5651d;}
+  .pill.manicurista{background:#f3e8fb;color:#7b3fb0;}
+  .pill.efectivo{background:#eef6e8;color:#5a8a2c;}
+  .pill.yappy{background:#e3edfc;color:#2f5fad;}
+  .row-actions button{
+    background:none;border:none;font-size:14px;padding:4px 6px;color:var(--gray-light);
+  }
+  .row-actions button:hover{color:var(--teal-dark);}
+  .row-actions button.del:hover{color:var(--danger);}
+  .empty-msg{text-align:center;color:var(--gray-light);padding:30px 10px;font-size:13.5px;}
+
+  /* ---------- SERVICES ---------- */
+  .service-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;}
+  .service-col h3{
+    display:flex;align-items:center;gap:8px;font-size:16px;margin:0 0 14px;
+  }
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .dot.cejas{background:var(--teal);}
+  .dot.estilista{background:#e08a3c;}
+  .dot.manicurista{background:#a463d1;}
+  .service-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 4px;border-bottom:1px solid var(--line);font-size:13.5px;
+  }
+  .service-item .sname{font-weight:500;}
+  .service-item .sprice{color:var(--teal-dark);font-weight:600;margin-left:auto;margin-right:10px;}
+  .add-service-form{display:flex;gap:8px;margin-top:14px;}
+  .add-service-form input{flex:1;}
+
+  /* ---------- CALENDAR ---------- */
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .cal-header h3{margin:0;font-size:18px;}
+  .cal-nav button{background:var(--white);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:14px;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+  .cal-dow{text-align:center;font-size:11.5px;color:var(--gray);font-weight:600;text-transform:uppercase;padding-bottom:6px;}
+  .cal-day{
+    background:#fff;border:1px solid var(--line);border-radius:10px;min-height:80px;
+    padding:8px;font-size:12.5px;position:relative;cursor:pointer;transition:box-shadow .15s;
+  }
+  .cal-day:hover{box-shadow:var(--shadow-sm);}
+  .cal-day.muted{opacity:0.35;}
+  .cal-day.today{border-color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--teal);}
+  .cal-day .dnum{font-weight:600;}
+  .cal-day .apt-count{
+    margin-top:6px;background:var(--teal);color:#fff;border-radius:20px;
+    font-size:10.5px;padding:2px 8px;display:inline-block;
+  }
+  .week-list{display:flex;flex-direction:column;gap:10px;}
+  .week-day-block{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .week-day-block h4{margin:0 0 8px;font-size:14px;}
+  .apt-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px dashed var(--line);font-size:13px;}
+  .apt-row:first-of-type{border-top:none;}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(15,30,28,0.45);
+    align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal-box{
+    background:#fff;border-radius:var(--radius);padding:26px;max-width:520px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);max-height:88vh;overflow:auto;
+  }
+  .modal-box h3{margin:0 0 16px;font-size:18px;}
+  .modal-close{float:right;background:none;border:none;font-size:20px;color:var(--gray);}
+
+  .view-toggle-cal{display:flex;gap:8px;}
+
+  .badge-locked{background:#f3f3f3;color:var(--gray);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+
+  .cierre-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0;}
+  .cierre-summary .item{background:#fbfffe;border:1px solid var(--line);border-radius:12px;padding:14px;}
+  .cierre-summary .item .k{font-size:11.5px;color:var(--gray);text-transform:uppercase;letter-spacing:0.4px;}
+  .cierre-summary .item .v{font-size:19px;font-weight:600;margin-top:4px;}
+
+  .toast{
+    position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;
+    padding:12px 20px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow);
+    opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;z-index:200;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  @media(max-width:860px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{position:relative;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;}
+    nav.tabs{flex-direction:row;flex-wrap:wrap;}
+    main{padding:20px;}
+  }
+
+  @media print{
+    .sidebar,.page-header .btn,.no-print{display:none !important;}
+    main{padding:0;}
+    body{background:#fff;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Cejas Lovely</h1>
+      <span class="brand-script">Panel Administrativo</span>
+    </div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-view="dashboard">📊 &nbsp;Dashboard</button>
+      <button class="tab-btn" data-view="movimientos">💰 &nbsp;Ingresos y Gastos</button>
+      <button class="tab-btn" data-view="servicios">✂️ &nbsp;Servicios</button>
+      <button class="tab-btn" data-view="calendario">📅 &nbsp;Calendario</button>
+      <button class="tab-btn" data-view="caja">🗂️ &nbsp;Cierre de Caja</button>
+    </nav>
+    <div class="sidebar-footer">Cejas Lovely · Máster en Cejas<br>Datos guardados en este navegador</div>
+  </aside>
+
+  <main>
+
+    <!-- ================= DASHBOARD ================= -->
+    <section class="view active" id="view-dashboard">
+      <div class="page-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Resumen del rendimiento del salón</p>
+        </div>
+        <div class="period-toggle" id="dashPeriodToggle">
+          <button data-period="day" class="active">Hoy</button>
+          <button data-period="week">Esta semana</button>
+          <button data-period="month">Este mes</button>
+        </div>
+      </div>
+
+      <div class="stat-grid" id="dashStats"></div>
+
+      <div class="chart-grid">
+        <div class="card chart-card">
+          <h3>Tendencia de ingresos y gastos</h3>
+          <canvas id="chartTrend" height="220"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3>Ingresos por categoría</h3>
+          <canvas id="chartCategory" height="220"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3>Método de pago</h3>
+          <canvas id="chartPayment" height="220"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MOVIMIENTOS ================= -->
+    <section class="view" id="view-movimientos">
+      <div class="page-header">
+        <div>
+          <h2>Ingresos y Gastos</h2>
+          <p>Registra las transacciones diarias del salón</p>
+        </div>
+      </div>
+
+      <div class="tab-switch">
+        <button class="mv-tab active" data-mv="ingreso">＋ Registrar Ingreso</button>
+        <button class="mv-tab expense-tab" data-mv="gasto">－ Registrar Gasto</button>
+      </div>
+
+      <div class="card" id="mv-form-card">
+        <!-- Ingreso Form -->
+        <form id="formIngreso" class="mv-form">
+          <input type="hidden" id="ing-editId">
+          <div class="form-grid">
+            <div>
+              <label>Fecha</label>
+              <input type="date" id="ing-fecha" required>
+            </div>
+            <div>
+              <label>Categoría</label>
+              <select id="ing-categoria" required>
+                <option value="cejas">Cejas</option>
+                <option value="estilista">Estilista</option>
+                <option value="manicurista">Manicurista</option>
+              </select>
+            </div>
+            <div>
+              <label>Servicio</label>
+              <select id="ing-servicio" required></select>
+            </div>
+            <div>
+              <label>Cliente</label>
+              <input type="text" id="ing-cliente" placeholder="Nombre del cliente" required>
+            </div>
+            <div>
+              <label>Precio (US$)</label>
+              <input type="number" step="0.01" min="0" id="ing-precio" required>
+            </div>
+            <div>
+              <label>Método de pago</label>
+              <select id="ing-pago" required>
+                <option value="efectivo">Efectivo</option>
+                <option value="yappy">Yappy</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <label>Notas (opcional)</label>
+            <input type="text" id="ing-notas" placeholder="Notas adicionales">
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn">Guardar Ingreso</button>
+            <button type="button" class="btn ghost" id="ing-cancel" style="display:none;">Cancelar edición</button>
+          </div>
+        </form>
+
+        <!-- Gasto Form -->
+        <form id="formGasto" class="mv-form" style="display:none;">
+          <input type="hidden" id="gas-editId">
+          <div class="form-grid">
+            <div>
+              <label>Fecha</label>
+              <input type="date" id="gas-fecha" required>
+            </div>
+            <div>
+              <label>Categoría</label>
+              <select id="gas-categoria" required>
+                <option value="Insumos">Insumos</option>
+                <option value="Renta">Renta</option>
+                <option value="Servicios públicos">Servicios públicos</option>
+                <option value="Salarios">Salarios</option>
+                <option value="Publicidad">Publicidad</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div>
+              <label>Descripción</label>
+              <input type="text" id="gas-desc" placeholder="Ej. Compra de cera" required>
+            </div>
+            <div>
+              <label>Monto (US$)</label>
+              <input type="number" step="0.01" min="0" id="gas-monto" required>
+            </div>
+            <div>
+              <label>Método de pago</label>
+              <select id="gas-pago" required>
+                <option value="efectivo">Efectivo</option>
+                <option value="yappy">Yappy</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn danger">Guardar Gasto</button>
+            <button type="button" class="btn ghost" id="gas-cancel" style="display:none;">Cancelar edición</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <div class="page-header" style="margin-bottom:6px;">
+          <h3 style="margin:0;font-size:16px;">Movimientos recientes</h3>
+          <div class="form-grid" style="grid-template-columns:auto auto;gap:8px;">
+            <div>
+              <input type="date" id="filterDesde">
+            </div>
+            <div>
+              <input type="date" id="filterHasta">
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Tipo</th><th>Detalle</th><th>Cliente</th><th>Pago</th><th>Monto</th><th></th></tr>
+          </thead>
+          <tbody id="movTableBody"></tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SERVICIOS ================= -->
+    <section class="view" id="view-servicios">
+      <div class="page-header">
+        <div>
+          <h2>Servicios</h2>
+          <p>Administra las categorías, subservicios y precios</p>
+        </div>
+      </div>
+      <div class="service-columns" id="serviceColumns"></div>
+    </section>
+
+    <!-- ================= CALENDARIO ================= -->
+    <section class="view" id="view-calendario">
+      <div class="page-header">
+        <div>
+          <h2>Calendario de Citas</h2>
+          <p>Agenda diaria y semanal confirmada por clientes</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="period-toggle" id="calViewToggle">
+            <button data-calview="month" class="active">Mes</button>
+            <button data-calview="week">Semana</button>
+          </div>
+          <button class="btn" id="btnNuevaCita">＋ Nueva Cita</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="calMonthView">
+          <div class="cal-header">
+            <div class="cal-nav"><button id="calPrev">‹</button></div>
+            <h3 id="calMonthLabel"></h3>
+            <div class="cal-nav"><button id="calNext">›</button></div>
+          </div>
+          <div class="cal-grid" id="calDowRow"></div>
+          <div class="cal-grid" id="calGrid" style="margin-top:8px;"></div>
+        </div>
+        <div id="calWeekView" style="display:none;">
+          <div class="cal-header">
+            <div class="cal-nav"><button id="calWeekPrev">‹</button></div>
+            <h3 id="calWeekLabel"></h3>
+            <div class="cal-nav"><button id="calWeekNext">›</button></div>
+          </div>
+          <div class="week-list" id="weekList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CIERRE DE CAJA ================= -->
+    <section class="view" id="view-caja">
+      <div class="page-header">
+        <div>
+          <h2>Cierre de Caja</h2>
+          <p>Cierra y consulta el registro diario de caja</p>
+        </div>
+        <div>
+          <label style="margin-bottom:2px;">Fecha</label>
+          <input type="date" id="cajaFecha">
+        </div>
+      </div>
+
+      <div class="card" id="cajaResumenCard"></div>
+
+      <div class="card" style="margin-top:22px;">
+        <h3 style="margin:0 0 6px;font-size:16px;">Historial de cierres</h3>
+        <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Ingresos</th><th>Gastos</th><th>Neto</th><th>Clientes</th><th>Cerrado</th><th></th></tr>
+          </thead>
+          <tbody id="cierreHistBody"></tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   CEJAS LOVELY — PANEL ADMINISTRATIVO
+   Almacenamiento: localStorage (un solo dispositivo/navegador)
+   ========================================================= */
+
+const STORAGE_KEY = 'cejasLovelyData_v1';
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function fmtMoney(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0); }
+function fmtDateHuman(iso){
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('es-PA',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+}
+
+function defaultData(){
+  return {
+    services: {
+      cejas: [
+        {id:uid(), name:'Depilación de cejas', price:8},
+        {id:uid(), name:'Bozo', price:3},
+        {id:uid(), name:'Barbilla', price:3},
+        {id:uid(), name:'Mentón', price:3},
+        {id:uid(), name:'Frente', price:3},
+        {id:uid(), name:'Axilas', price:6},
+        {id:uid(), name:'Piernas', price:12},
+        {id:uid(), name:'Bikini', price:12},
+        {id:uid(), name:'Cejas semipermanente', price:80},
+        {id:uid(), name:'Pestañas punto a punto', price:35},
+        {id:uid(), name:'Lifting de pestañas', price:30},
+      ],
+      estilista: [
+        {id:uid(), name:'Corte de cabello', price:12},
+        {id:uid(), name:'Peinado', price:15},
+      ],
+      manicurista: [
+        {id:uid(), name:'Manicure clásica', price:10},
+        {id:uid(), name:'Pedicure clásica', price:12},
+      ]
+    },
+    incomes: [],
+    expenses: [],
+    appointments: [],
+    cashClosings: []
+  };
+}
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) { const d = defaultData(); saveData(d); return d; }
+    return JSON.parse(raw);
+  }catch(e){
+    console.error('Error leyendo datos, restaurando por defecto', e);
+    const d = defaultData(); saveData(d); return d;
+  }
+}
+function saveData(d){ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+let DB = loadData();
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* ---------------- NAVIGATION ---------------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    if(btn.dataset.view==='dashboard') renderDashboard();
+    if(btn.dataset.view==='movimientos') renderMovimientos();
+    if(btn.dataset.view==='servicios') renderServicios();
+    if(btn.dataset.view==='calendario') renderCalendario();
+    if(btn.dataset.view==='caja') renderCaja();
+  });
+});
+
+/* ---------------- MODAL ---------------- */
+function openModal(title, innerHtml){
+  document.getElementById('modalBox').innerHTML =
+    `<button class="modal-close" onclick="closeModal()">&times;</button><h3>${title}</h3>${innerHtml}`;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
+document.getElementById('modalOverlay').addEventListener('click', e=>{
+  if(e.target.id==='modalOverlay') closeModal();
+});
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+let dashPeriod = 'day';
+let charts = {};
+
+function getPeriodRange(period, refDate){
+  const ref = refDate ? new Date(refDate+'T00:00:00') : new Date();
+  let start, end;
+  if(period==='day'){
+    start = new Date(ref); end = new Date(ref);
+  } else if(period==='week'){
+    const day = ref.getDay(); // 0 sun
+    const diffToMonday = (day===0? -6 : 1-day);
+    start = new Date(ref); start.setDate(ref.getDate()+diffToMonday);
+    end = new Date(start); end.setDate(start.getDate()+6);
+  } else { // month
+    start = new Date(ref.getFullYear(), ref.getMonth(), 1);
+    end = new Date(ref.getFullYear(), ref.getMonth()+1, 0);
+  }
+  const toISO = d => d.toISOString().slice(0,10);
+  return {start: toISO(start), end: toISO(end)};
+}
+function inRange(dateStr, start, end){ return dateStr>=start && dateStr<=end; }
+
+function computeStats(period){
+  const {start,end} = getPeriodRange(period);
+  const incomes = DB.incomes.filter(i=>inRange(i.date,start,end));
+  const expenses = DB.expenses.filter(e=>inRange(e.date,start,end));
+  const totalIncome = incomes.reduce((s,i)=>s+Number(i.price),0);
+  const totalExpense = expenses.reduce((s,e)=>s+Number(e.amount),0);
+  const clientSet = new Set(incomes.filter(i=>i.client).map(i=>i.client.trim().toLowerCase()));
+  return {
+    start,end,incomes,expenses,
+    totalIncome, totalExpense, net: totalIncome-totalExpense,
+    servicesCount: incomes.length,
+    clientsCount: clientSet.size
+  };
+}
+
+function renderDashboard(){
+  const stats = computeStats(dashPeriod);
+  const grid = document.getElementById('dashStats');
+  grid.innerHTML = `
+    <div class="stat-card">
+      <div class="label">Ingresos</div>
+      <div class="value">${fmtMoney(stats.totalIncome)}</div>
+    </div>
+    <div class="stat-card expense">
+      <div class="label">Gastos</div>
+      <div class="value">${fmtMoney(stats.totalExpense)}</div>
+    </div>
+    <div class="stat-card profit">
+      <div class="label">Ganancia neta</div>
+      <div class="value">${fmtMoney(stats.net)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Clientes atendidos</div>
+      <div class="value">${stats.clientsCount}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Servicios realizados</div>
+      <div class="value">${stats.servicesCount}</div>
+    </div>
+  `;
+
+  renderTrendChart();
+  renderCategoryChart(stats);
+  renderPaymentChart(stats);
+}
+
+document.getElementById('dashPeriodToggle').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  document.querySelectorAll('#dashPeriodToggle button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  dashPeriod = e.target.dataset.period;
+  renderDashboard();
+});
+
+function last14Days(){
+  const days = [];
+  for(let i=13;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  return days;
+}
+
+function renderTrendChart(){
+  const days = last14Days();
+  const incomeData = days.map(d=> DB.incomes.filter(i=>i.date===d).reduce((s,i)=>s+Number(i.price),0));
+  const expenseData = days.map(d=> DB.expenses.filter(e=>e.date===d).reduce((s,e)=>s+Number(e.amount),0));
+  const labels = days.map(d=> new Date(d+'T00:00:00').toLocaleDateString('es-PA',{day:'2-digit',month:'2-digit'}));
+
+  if(charts.trend) charts.trend.destroy();
+  charts.trend = new Chart(document.getElementById('chartTrend'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Ingresos', data:incomeData, borderColor:'#22a893', backgroundColor:'rgba(34,168,147,0.12)', fill:true, tension:0.35, pointRadius:2},
+        {label:'Gastos', data:expenseData, borderColor:'#c0554d', backgroundColor:'rgba(192,85,77,0.08)', fill:true, tension:0.35, pointRadius:2}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:11}}}},
+      scales:{ y:{ticks:{callback:v=>'$'+v}}, x:{ticks:{font:{size:10}}} }
+    }
+  });
+}
+
+function renderCategoryChart(stats){
+  const cats = ['cejas','estilista','manicurista'];
+  const labels = ['Cejas','Estilista','Manicurista'];
+  const data = cats.map(c=> stats.incomes.filter(i=>i.category===c).reduce((s,i)=>s+Number(i.price),0));
+  if(charts.cat) charts.cat.destroy();
+  charts.cat = new Chart(document.getElementById('chartCategory'), {
+    type:'doughnut',
+    data:{ labels, datasets:[{data, backgroundColor:['#22a893','#e08a3c','#a463d1'], borderWidth:0}] },
+    options:{ responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:11}}}} }
+  });
+}
+
+function renderPaymentChart(stats){
+  const efectivo = stats.incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
+  const yappy = stats.incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
+  if(charts.pay) charts.pay.destroy();
+  charts.pay = new Chart(document.getElementById('chartPayment'), {
+    type:'doughnut',
+    data:{ labels:['Efectivo','Yappy'], datasets:[{data:[efectivo,yappy], backgroundColor:['#5a8a2c','#2f5fad'], borderWidth:0}] },
+    options:{ responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:11}}}} }
+  });
+}
+
+/* =========================================================
+   MOVIMIENTOS (INGRESOS / GASTOS)
+   ========================================================= */
+function populateServiceSelect(){
+  const cat = document.getElementById('ing-categoria').value;
+  const sel = document.getElementById('ing-servicio');
+  sel.innerHTML = DB.services[cat].map(s=>`<option value="${s.id}" data-price="${s.price}">${s.name} — ${fmtMoney(s.price)}</option>`).join('') +
+    `<option value="__custom__">Otro (personalizado)</option>`;
+  const first = DB.services[cat][0];
+  document.getElementById('ing-precio').value = first ? first.price : '';
+}
+document.getElementById('ing-categoria').addEventListener('change', populateServiceSelect);
+document.getElementById('ing-servicio').addEventListener('change', e=>{
+  const opt = e.target.selectedOptions[0];
+  if(opt.value==='__custom__'){
+    document.getElementById('ing-precio').value = '';
+  } else {
+    document.getElementById('ing-precio').value = opt.dataset.price;
+  }
+});
+
+document.querySelectorAll('.mv-tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.mv-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const isIngreso = btn.dataset.mv==='ingreso';
+    document.getElementById('formIngreso').style.display = isIngreso? 'block':'none';
+    document.getElementById('formGasto').style.display = isIngreso? 'none':'block';
+  });
+});
+
+document.getElementById('formIngreso').addEventListener('submit', e=>{
+  e.preventDefault();
+  const editId = document.getElementById('ing-editId').value;
+  const catSel = document.getElementById('ing-categoria').value;
+  const servSel = document.getElementById('ing-servicio');
+  const opt = servSel.selectedOptions[0];
+  const serviceName = opt.value==='__custom__' ? prompt('Nombre del servicio personalizado:','Servicio') : opt.textContent.split(' — ')[0];
+
+  const record = {
+    id: editId || uid(),
+    date: document.getElementById('ing-fecha').value,
+    category: catSel,
+    serviceName: serviceName || 'Servicio',
+    client: document.getElementById('ing-cliente').value.trim(),
+    price: parseFloat(document.getElementById('ing-precio').value)||0,
+    payment: document.getElementById('ing-pago').value,
+    notes: document.getElementById('ing-notas').value.trim()
+  };
+  if(editId){
+    const idx = DB.incomes.findIndex(i=>i.id===editId);
+    if(idx>-1) DB.incomes[idx] = record;
+    toast('Ingreso actualizado');
+  } else {
+    DB.incomes.push(record);
+    toast('Ingreso registrado');
+  }
+  saveData(DB);
+  resetIngresoForm();
+  renderMovimientos();
+});
+
+document.getElementById('ing-cancel').addEventListener('click', resetIngresoForm);
+function resetIngresoForm(){
+  document.getElementById('formIngreso').reset();
+  document.getElementById('ing-editId').value='';
+  document.getElementById('ing-cancel').style.display='none';
+  document.getElementById('ing-fecha').value = todayISO();
+  populateServiceSelect();
+}
+
+document.getElementById('formGasto').addEventListener('submit', e=>{
+  e.preventDefault();
+  const editId = document.getElementById('gas-editId').value;
+  const record = {
+    id: editId || uid(),
+    date: document.getElementById('gas-fecha').value,
+    category: document.getElementById('gas-categoria').value,
+    description: document.getElementById('gas-desc').value.trim(),
+    amount: parseFloat(document.getElementById('gas-monto').value)||0,
+    payment: document.getElementById('gas-pago').value
+  };
+  if(editId){
+    const idx = DB.expenses.findIndex(x=>x.id===editId);
+    if(idx>-1) DB.expenses[idx]=record;
+    toast('Gasto actualizado');
+  } else {
+    DB.expenses.push(record);
+    toast('Gasto registrado');
+  }
+  saveData(DB);
+  resetGastoForm();
+  renderMovimientos();
+});
+document.getElementById('gas-cancel').addEventListener('click', resetGastoForm);
+function resetGastoForm(){
+  document.getElementById('formGasto').reset();
+  document.getElementById('gas-editId').value='';
+  document.getElementById('gas-cancel').style.display='none';
+  document.getElementById('gas-fecha').value = todayISO();
+}
+
+function editIncome(id){
+  const rec = DB.incomes.find(i=>i.id===id);
+  if(!rec) return;
+  document.querySelector('.mv-tab[data-mv="ingreso"]').click();
+  document.getElementById('ing-editId').value = rec.id;
+  document.getElementById('ing-fecha').value = rec.date;
+  document.getElementById('ing-categoria').value = rec.category;
+  populateServiceSelect();
+  document.getElementById('ing-cliente').value = rec.client;
+  document.getElementById('ing-precio').value = rec.price;
+  document.getElementById('ing-pago').value = rec.payment;
+  document.getElementById('ing-notas').value = rec.notes||'';
+  document.getElementById('ing-cancel').style.display='inline-block';
+  document.getElementById('mv-form-card').scrollIntoView({behavior:'smooth'});
+}
+function deleteIncome(id){
+  if(!confirm('¿Eliminar este ingreso?')) return;
+  DB.incomes = DB.incomes.filter(i=>i.id!==id);
+  saveData(DB); renderMovimientos(); toast('Ingreso eliminado');
+}
+function editExpense(id){
+  const rec = DB.expenses.find(i=>i.id===id);
+  if(!rec) return;
+  document.querySelector('.mv-tab[data-mv="gasto"]').click();
+  document.getElementById('gas-editId').value = rec.id;
+  document.getElementById('gas-fecha').value = rec.date;
+  document.getElementById('gas-categoria').value = rec.category;
+  document.getElementById('gas-desc').value = rec.description;
+  document.getElementById('gas-monto').value = rec.amount;
+  document.getElementById('gas-pago').value = rec.payment;
+  document.getElementById('gas-cancel').style.display='inline-block';
+  document.getElementById('mv-form-card').scrollIntoView({behavior:'smooth'});
+}
+function deleteExpense(id){
+  if(!confirm('¿Eliminar este gasto?')) return;
+  DB.expenses = DB.expenses.filter(i=>i.id!==id);
+  saveData(DB); renderMovimientos(); toast('Gasto eliminado');
+}
+
+document.getElementById('filterDesde').addEventListener('change', renderMovimientos);
+document.getElementById('filterHasta').addEventListener('change', renderMovimientos);
+
+function renderMovimientos(){
+  const desde = document.getElementById('filterDesde').value;
+  const hasta = document.getElementById('filterHasta').value;
+  let items = [];
+  DB.incomes.forEach(i=> items.push({type:'ingreso', ...i, amount:i.price}));
+  DB.expenses.forEach(e=> items.push({type:'gasto', ...e}));
+  if(desde) items = items.filter(x=>x.date>=desde);
+  if(hasta) items = items.filter(x=>x.date<=hasta);
+  items.sort((a,b)=> b.date.localeCompare(a.date));
+
+  const tbody = document.getElementById('movTableBody');
+  if(items.length===0){
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-msg">Aún no hay movimientos registrados</td></tr>`;
+  } else {
+    tbody.innerHTML = items.map(x=>{
+      if(x.type==='ingreso'){
+        return `<tr>
+          <td>${x.date}</td>
+          <td><span class="pill ${x.category}">${x.category}</span></td>
+          <td>${x.serviceName}</td>
+          <td>${x.client||'—'}</td>
+          <td><span class="pill ${x.payment}">${x.payment}</span></td>
+          <td style="color:var(--teal-dark);font-weight:600;">+${fmtMoney(x.amount)}</td>
+          <td class="row-actions">
+            <button onclick="editIncome('${x.id}')" title="Editar">✎</button>
+            <button class="del" onclick="deleteIncome('${x.id}')" title="Eliminar">🗑</button>
+          </td>
+        </tr>`;
+      } else {
+        return `<tr>
+          <td>${x.date}</td>
+          <td><span class="pill" style="background:var(--danger-light);color:var(--danger);">${x.category}</span></td>
+          <td>${x.description}</td>
+          <td>—</td>
+          <td><span class="pill ${x.payment}">${x.payment}</span></td>
+          <td style="color:var(--danger);font-weight:600;">−${fmtMoney(x.amount)}</td>
+          <td class="row-actions">
+            <button onclick="editExpense('${x.id}')" title="Editar">✎</button>
+            <button class="del" onclick="deleteExpense('${x.id}')" title="Eliminar">🗑</button>
+          </td>
+        </tr>`;
+      }
+    }).join('');
+  }
+}
+
+/* =========================================================
+   SERVICIOS
+   ========================================================= */
+const catMeta = {
+  cejas:{label:'Cejas', dot:'cejas'},
+  estilista:{label:'Estilista', dot:'estilista'},
+  manicurista:{label:'Manicurista', dot:'manicurista'}
+};
+
+function renderServicios(){
+  const wrap = document.getElementById('serviceColumns');
+  wrap.innerHTML = Object.keys(catMeta).map(cat=>{
+    const items = DB.services[cat];
+    const meta = catMeta[cat];
+    const itemsHtml = items.length? items.map(s=>`
+      <div class="service-item">
+        <span class="sname">${s.name}</span>
+        <span class="sprice">${fmtMoney(s.price)}</span>
+        <button class="btn ghost small" onclick="editService('${cat}','${s.id}')">✎</button>
+        <button class="btn ghost small" style="color:var(--danger);border-color:var(--danger-light);" onclick="deleteService('${cat}','${s.id}')">🗑</button>
+      </div>
+    `).join('') : `<div class="empty-msg">Sin servicios aún</div>`;
+    return `
+      <div class="card service-col">
+        <h3><span class="dot ${meta.dot}"></span> ${meta.label}</h3>
+        ${itemsHtml}
+        <form class="add-service-form" onsubmit="addService(event,'${cat}')">
+          <input type="text" placeholder="Nuevo servicio" required id="new-name-${cat}">
+          <input type="number" step="0.01" min="0" placeholder="Precio" required style="max-width:100px;" id="new-price-${cat}">
+          <button type="submit" class="btn small">＋</button>
+        </form>
+      </div>
+    `;
+  }).join('');
+}
+
+function addService(e, cat){
+  e.preventDefault();
+  const nameInput = document.getElementById(`new-name-${cat}`);
+  const priceInput = document.getElementById(`new-price-${cat}`);
+  DB.services[cat].push({id:uid(), name:nameInput.value.trim(), price:parseFloat(priceInput.value)||0});
+  saveData(DB);
+  renderServicios();
+  toast('Servicio agregado');
+}
+
+function editService(cat, id){
+  const s = DB.services[cat].find(x=>x.id===id);
+  if(!s) return;
+  openModal('Editar servicio', `
+    <div class="form-grid">
+      <div><label>Nombre</label><input type="text" id="edit-sname" value="${s.name}"></div>
+      <div><label>Precio (US$)</label><input type="number" step="0.01" min="0" id="edit-sprice" value="${s.price}"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="saveServiceEdit('${cat}','${id}')">Guardar</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
+    </div>
+  `);
+}
+function saveServiceEdit(cat,id){
+  const s = DB.services[cat].find(x=>x.id===id);
+  s.name = document.getElementById('edit-sname').value.trim();
+  s.price = parseFloat(document.getElementById('edit-sprice').value)||0;
+  saveData(DB);
+  closeModal();
+  renderServicios();
+  toast('Servicio actualizado');
+}
+function deleteService(cat,id){
+  if(!confirm('¿Eliminar este servicio?')) return;
+  DB.services[cat] = DB.services[cat].filter(x=>x.id!==id);
+  saveData(DB);
+  renderServicios();
+  toast('Servicio eliminado');
+}
+
+/* =========================================================
+   CALENDARIO
+   ========================================================= */
+let calRefDate = new Date();
+let calMode = 'month';
+
+document.getElementById('calViewToggle').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  document.querySelectorAll('#calViewToggle button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  calMode = e.target.dataset.calview;
+  document.getElementById('calMonthView').style.display = calMode==='month'?'block':'none';
+  document.getElementById('calWeekView').style.display = calMode==='week'?'block':'none';
+  renderCalendario();
+});
+document.getElementById('calPrev').addEventListener('click', ()=>{ calRefDate.setMonth(calRefDate.getMonth()-1); renderCalendario(); });
+document.getElementById('calNext').addEventListener('click', ()=>{ calRefDate.setMonth(calRefDate.getMonth()+1); renderCalendario(); });
+document.getElementById('calWeekPrev').addEventListener('click', ()=>{ calRefDate.setDate(calRefDate.getDate()-7); renderCalendario(); });
+document.getElementById('calWeekNext').addEventListener('click', ()=>{ calRefDate.setDate(calRefDate.getDate()+7); renderCalendario(); });
+document.getElementById('btnNuevaCita').addEventListener('click', ()=> openAppointmentModal());
+
+const DOW = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+
+function renderCalendario(){
+  document.getElementById('calDowRow').innerHTML = DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  if(calMode==='month') renderMonthGrid(); else renderWeekList();
+}
+
+function renderMonthGrid(){
+  const y = calRefDate.getFullYear(), m = calRefDate.getMonth();
+  document.getElementById('calMonthLabel').textContent = calRefDate.toLocaleDateString('es-PA',{month:'long',year:'numeric'});
+  const firstDay = new Date(y,m,1);
+  let startOffset = firstDay.getDay()-1; if(startOffset<0) startOffset=6;
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const todayStr = todayISO();
+
+  let cells = [];
+  for(let i=0;i<startOffset;i++) cells.push(null);
+  for(let d=1; d<=daysInMonth; d++) cells.push(d);
+  while(cells.length % 7 !== 0) cells.push(null);
+
+  document.getElementById('calGrid').innerHTML = cells.map(d=>{
+    if(!d) return `<div class="cal-day muted"></div>`;
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const apts = DB.appointments.filter(a=>a.date===dateStr);
+    const isToday = dateStr===todayStr;
+    return `<div class="cal-day ${isToday?'today':''}" onclick="openDayDetail('${dateStr}')">
+      <div class="dnum">${d}</div>
+      ${apts.length? `<span class="apt-count">${apts.length} cita${apts.length>1?'s':''}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderWeekList(){
+  const ref = new Date(calRefDate);
+  const day = ref.getDay(); const diffToMonday = (day===0?-6:1-day);
+  const monday = new Date(ref); monday.setDate(ref.getDate()+diffToMonday);
+  const days = [];
+  for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); days.push(d); }
+  document.getElementById('calWeekLabel').textContent =
+    `${days[0].toLocaleDateString('es-PA',{day:'2-digit',month:'short'})} – ${days[6].toLocaleDateString('es-PA',{day:'2-digit',month:'short',year:'numeric'})}`;
+
+  document.getElementById('weekList').innerHTML = days.map(d=>{
+    const dateStr = d.toISOString().slice(0,10);
+    const apts = DB.appointments.filter(a=>a.date===dateStr).sort((a,b)=>a.time.localeCompare(b.time));
+    return `<div class="week-day-block">
+      <h4>${d.toLocaleDateString('es-PA',{weekday:'long',day:'2-digit',month:'short'})}</h4>
+      ${apts.length? apts.map(a=>`
+        <div class="apt-row">
+          <span><strong>${a.time}</strong> — ${a.client} <span class="pill ${a.category}">${a.category}</span> ${a.serviceName}</span>
+          <span class="row-actions">
+            <button onclick="editAppointment('${a.id}')">✎</button>
+            <button class="del" onclick="deleteAppointment('${a.id}')">🗑</button>
+          </span>
+        </div>`).join('') : `<div class="empty-msg" style="padding:8px 0;">Sin citas</div>`}
+      <button class="btn ghost small" style="margin-top:8px;" onclick="openAppointmentModal('${dateStr}')">＋ Agregar cita</button>
+    </div>`;
+  }).join('');
+}
+
+function openDayDetail(dateStr){
+  const apts = DB.appointments.filter(a=>a.date===dateStr).sort((a,b)=>a.time.localeCompare(b.time));
+  openModal(`Citas — ${fmtDateHuman(dateStr)}`, `
+    <div id="dayAptList">
+      ${apts.length? apts.map(a=>`
+        <div class="apt-row">
+          <span><strong>${a.time}</strong> — ${a.client} <span class="pill ${a.category}">${a.category}</span> ${a.serviceName}</span>
+          <span class="row-actions">
+            <button onclick="editAppointment('${a.id}')">✎</button>
+            <button class="del" onclick="deleteAppointment('${a.id}')">🗑</button>
+          </span>
+        </div>`).join('') : `<div class="empty-msg">Sin citas este día</div>`}
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="closeModal(); openAppointmentModal('${dateStr}')">＋ Nueva cita este día</button>
+    </div>
+  `);
+}
+
+function openAppointmentModal(dateStr, editId){
+  const rec = editId ? DB.appointments.find(a=>a.id===editId) : null;
+  const date = rec ? rec.date : (dateStr || todayISO());
+  const catOptions = Object.keys(catMeta).map(c=>`<option value="${c}" ${rec&&rec.category===c?'selected':''}>${catMeta[c].label}</option>`).join('');
+  openModal(rec? 'Editar cita' : 'Nueva cita', `
+    <div class="form-grid">
+      <div><label>Fecha</label><input type="date" id="apt-date" value="${date}"></div>
+      <div><label>Hora</label><input type="time" id="apt-time" value="${rec?rec.time:'10:00'}"></div>
+      <div><label>Cliente</label><input type="text" id="apt-client" value="${rec?rec.client:''}" placeholder="Nombre del cliente"></div>
+      <div><label>Categoría</label><select id="apt-category">${catOptions}</select></div>
+      <div><label>Servicio</label><input type="text" id="apt-service" value="${rec?rec.serviceName:''}" placeholder="Ej. Cejas semipermanente"></div>
+    </div>
+    <div style="margin-top:12px;"><label>Notas</label><input type="text" id="apt-notes" value="${rec?(rec.notes||''):''}"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="saveAppointment(${editId?`'${editId}'`:'null'})">Guardar cita</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
+    </div>
+  `);
+}
+function editAppointment(id){ closeModal(); openAppointmentModal(null, id); }
+
+function saveAppointment(editId){
+  const record = {
+    id: editId || uid(),
+    date: document.getElementById('apt-date').value,
+    time: document.getElementById('apt-time').value,
+    client: document.getElementById('apt-client').value.trim(),
+    category: document.getElementById('apt-category').value,
+    serviceName: document.getElementById('apt-service').value.trim(),
+    notes: document.getElementById('apt-notes').value.trim(),
+    status: 'confirmado'
+  };
+  if(editId){
+    const idx = DB.appointments.findIndex(a=>a.id===editId);
+    if(idx>-1) DB.appointments[idx]=record;
+    toast('Cita actualizada');
+  } else {
+    DB.appointments.push(record);
+    toast('Cita agregada');
+  }
+  saveData(DB);
+  closeModal();
+  renderCalendario();
+}
+function deleteAppointment(id){
+  if(!confirm('¿Eliminar esta cita?')) return;
+  DB.appointments = DB.appointments.filter(a=>a.id!==id);
+  saveData(DB);
+  closeModal();
+  renderCalendario();
+}
+
+/* =========================================================
+   CIERRE DE CAJA
+   ========================================================= */
+document.getElementById('cajaFecha').addEventListener('change', renderCaja);
+
+function renderCaja(){
+  const fechaInput = document.getElementById('cajaFecha');
+  if(!fechaInput.value) fechaInput.value = todayISO();
+  const fecha = fechaInput.value;
+
+  const incomes = DB.incomes.filter(i=>i.date===fecha);
+  const expenses = DB.expenses.filter(e=>e.date===fecha);
+  const cashIn = incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
+  const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
+  const cashOut = expenses.filter(e=>e.payment==='efectivo').reduce((s,e)=>s+Number(e.amount),0);
+  const yappyOut = expenses.filter(e=>e.payment==='yappy').reduce((s,e)=>s+Number(e.amount),0);
+  const totalIn = cashIn+yappyIn, totalOut = cashOut+yappyOut, net = totalIn-totalOut;
+  const clientsCount = new Set(incomes.filter(i=>i.client).map(i=>i.client.trim().toLowerCase())).size;
+
+  const existing = DB.cashClosings.find(c=>c.date===fecha);
+
+  document.getElementById('cajaResumenCard').innerHTML = `
+    <div class="page-header" style="margin-bottom:0;">
+      <h3 style="margin:0;font-size:16px;">Resumen — ${fmtDateHuman(fecha)}</h3>
+      ${existing? `<span class="badge-locked">🔒 Caja cerrada a las ${existing.closedAt}</span>` : ''}
+    </div>
+    <div class="cierre-summary">
+      <div class="item"><div class="k">Ingresos efectivo</div><div class="v">${fmtMoney(cashIn)}</div></div>
+      <div class="item"><div class="k">Ingresos Yappy</div><div class="v">${fmtMoney(yappyIn)}</div></div>
+      <div class="item"><div class="k">Total ingresos</div><div class="v" style="color:var(--teal-dark);">${fmtMoney(totalIn)}</div></div>
+      <div class="item"><div class="k">Gastos efectivo</div><div class="v">${fmtMoney(cashOut)}</div></div>
+      <div class="item"><div class="k">Gastos Yappy</div><div class="v">${fmtMoney(yappyOut)}</div></div>
+      <div class="item"><div class="k">Total gastos</div><div class="v" style="color:var(--danger);">${fmtMoney(totalOut)}</div></div>
+      <div class="item"><div class="k">Ganancia neta</div><div class="v" style="color:var(--teal-dark);">${fmtMoney(net)}</div></div>
+      <div class="item"><div class="k">Clientes atendidos</div><div class="v">${clientsCount}</div></div>
+    </div>
+    <div class="btn-row no-print">
+      <button class="btn" onclick="closeCashRegister('${fecha}')">${existing? '🔒 Volver a cerrar caja' : '🔒 Cerrar caja del día'}</button>
+      <button class="btn ghost" onclick="window.print()">🖨 Imprimir reporte</button>
+    </div>
+  `;
+
+  renderCierreHistorial();
+}
+
+function closeCashRegister(fecha){
+  const incomes = DB.incomes.filter(i=>i.date===fecha);
+  const expenses = DB.expenses.filter(e=>e.date===fecha);
+  const cashIn = incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
+  const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
+  const cashOut = expenses.filter(e=>e.payment==='efectivo').reduce((s,e)=>s+Number(e.amount),0);
+  const yappyOut = expenses.filter(e=>e.payment==='yappy').reduce((s,e)=>s+Number(e.amount),0);
+  const totalIn = cashIn+yappyIn, totalOut = cashOut+yappyOut;
+  const clientsCount = new Set(incomes.filter(i=>i.client).map(i=>i.client.trim().toLowerCase())).size;
+
+  const existingIdx = DB.cashClosings.findIndex(c=>c.date===fecha);
+  const record = {
+    id: existingIdx>-1? DB.cashClosings[existingIdx].id : uid(),
+    date: fecha,
+    cashIncome:cashIn, yappyIncome:yappyIn, totalIncome:totalIn,
+    cashExpense:cashOut, yappyExpense:yappyOut, totalExpense:totalOut,
+    net: totalIn-totalOut,
+    clientsCount,
+    closedAt: new Date().toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})
+  };
+  if(existingIdx>-1){
+    if(!confirm('Ya existe un cierre para este día. ¿Deseas actualizarlo con los datos actuales?')) return;
+    DB.cashClosings[existingIdx] = record;
+  } else {
+    DB.cashClosings.push(record);
+  }
+  saveData(DB);
+  toast('Caja cerrada correctamente');
+  renderCaja();
+}
+
+function renderCierreHistorial(){
+  const list = [...DB.cashClosings].sort((a,b)=>b.date.localeCompare(a.date));
+  const tbody = document.getElementById('cierreHistBody');
+  if(list.length===0){
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-msg">Aún no hay cierres guardados</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(c=>`
+    <tr>
+      <td>${c.date}</td>
+      <td style="color:var(--teal-dark);font-weight:600;">${fmtMoney(c.totalIncome)}</td>
+      <td style="color:var(--danger);font-weight:600;">${fmtMoney(c.totalExpense)}</td>
+      <td style="font-weight:600;">${fmtMoney(c.net)}</td>
+      <td>${c.clientsCount}</td>
+      <td>${c.closedAt}</td>
+      <td class="row-actions"><button onclick="document.getElementById('cajaFecha').value='${c.date}'; renderCaja();" title="Ver">👁</button></td>
+    </tr>
+  `).join('');
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function init(){
+  document.getElementById('ing-fecha').value = todayISO();
+  document.getElementById('gas-fecha').value = todayISO();
+  document.getElementById('cajaFecha').value = todayISO();
+  populateServiceSelect();
+  renderDashboard();
+  renderMovimientos();
+}
+init();
+</script>
+</body>
+</html>
