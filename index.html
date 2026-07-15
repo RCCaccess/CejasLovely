@@ -604,12 +604,20 @@
 
       <div class="card" id="cajaResumenCard"></div>
 
+      <div class="page-header" style="margin-top:26px;margin-bottom:10px;">
+        <div>
+          <h3 style="margin:0;font-size:17px;">Cierre por área</h3>
+          <p style="margin:2px 0 0;">Calcula ingresos, comisión y pago a la trabajadora de cada área</p>
+        </div>
+      </div>
+      <div class="service-columns" id="cajaAreaCards"></div>
+
       <div class="card" style="margin-top:22px;">
         <h3 style="margin:0 0 6px;font-size:16px;">Historial de cierres</h3>
         <div style="overflow-x:auto;">
         <table>
           <thead>
-            <tr><th>Fecha</th><th>Ingresos</th><th>Gastos</th><th>Neto</th><th>Clientes</th><th>Cerrado</th><th></th></tr>
+            <tr><th>Fecha</th><th>Área</th><th>Ingresos</th><th>Clientes</th><th>% Comisión</th><th>Pago trabajadora</th><th>Neto salón</th><th>Cerrado</th><th></th></tr>
           </thead>
           <tbody id="cierreHistBody"></tbody>
         </table>
@@ -699,7 +707,10 @@ function defaultData(){
     incomes: [],
     expenses: [],
     appointments: [],
-    cashClosings: []
+    cashClosings: [],
+    settings: {
+      commissionPct: { cejas:0, estilista:0, manicurista:0 }
+    }
   };
 }
 
@@ -707,7 +718,14 @@ function loadData(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) { const d = defaultData(); saveData(d); return d; }
-    return JSON.parse(raw);
+    const d = JSON.parse(raw);
+    // migración: agregar settings si vienen de una versión anterior
+    if(!d.settings) d.settings = { commissionPct: { cejas:0, estilista:0, manicurista:0 } };
+    if(!d.settings.commissionPct) d.settings.commissionPct = { cejas:0, estilista:0, manicurista:0 };
+    ['cejas','estilista','manicurista'].forEach(a=>{
+      if(typeof d.settings.commissionPct[a] !== 'number') d.settings.commissionPct[a] = 0;
+    });
+    return d;
   }catch(e){
     console.error('Error leyendo datos, restaurando por defecto', e);
     const d = defaultData(); saveData(d); return d;
@@ -782,12 +800,11 @@ function computeStats(period){
   const expenses = DB.expenses.filter(e=>inRange(e.date,start,end));
   const totalIncome = incomes.reduce((s,i)=>s+Number(i.price),0);
   const totalExpense = expenses.reduce((s,e)=>s+Number(e.amount),0);
-  const clientSet = new Set(incomes.filter(i=>i.client).map(i=>i.client.trim().toLowerCase()));
   return {
     start,end,incomes,expenses,
     totalIncome, totalExpense, net: totalIncome-totalExpense,
     servicesCount: incomes.length,
-    clientsCount: clientSet.size
+    clientsCount: incomes.length /* cada ingreso registrado cuenta como un cliente atendido */
   };
 }
 
@@ -1321,14 +1338,11 @@ function renderCaja(){
   const cashOut = expenses.filter(e=>e.payment==='efectivo').reduce((s,e)=>s+Number(e.amount),0);
   const yappyOut = expenses.filter(e=>e.payment==='yappy').reduce((s,e)=>s+Number(e.amount),0);
   const totalIn = cashIn+yappyIn, totalOut = cashOut+yappyOut, net = totalIn-totalOut;
-  const clientsCount = new Set(incomes.filter(i=>i.client).map(i=>i.client.trim().toLowerCase())).size;
-
-  const existing = DB.cashClosings.find(c=>c.date===fecha);
+  const clientsCount = incomes.length;
 
   document.getElementById('cajaResumenCard').innerHTML = `
     <div class="page-header" style="margin-bottom:0;">
-      <h3 style="margin:0;font-size:16px;">Resumen — ${fmtDateHuman(fecha)}</h3>
-      ${existing? `<span class="badge-locked">🔒 Caja cerrada a las ${existing.closedAt}</span>` : ''}
+      <h3 style="margin:0;font-size:16px;">Resumen general — ${fmtDateHuman(fecha)}</h3>
     </div>
     <div class="cierre-summary">
       <div class="item"><div class="k">Ingresos efectivo</div><div class="v">${fmtMoney(cashIn)}</div></div>
@@ -1341,59 +1355,119 @@ function renderCaja(){
       <div class="item"><div class="k">Clientes atendidos</div><div class="v">${clientsCount}</div></div>
     </div>
     <div class="btn-row no-print">
-      <button class="btn" onclick="closeCashRegister('${fecha}')">${existing? '🔒 Volver a cerrar caja' : '🔒 Cerrar caja del día'}</button>
       <button class="btn ghost" onclick="window.print()">🖨 Imprimir reporte</button>
     </div>
   `;
 
+  renderCajaAreaCards(fecha);
   renderCierreHistorial();
 }
 
-function closeCashRegister(fecha){
-  const incomes = DB.incomes.filter(i=>i.date===fecha);
-  const expenses = DB.expenses.filter(e=>e.date===fecha);
+function renderCajaAreaCards(fecha){
+  const wrap = document.getElementById('cajaAreaCards');
+  wrap.innerHTML = Object.keys(catMeta).map(area=>{
+    const meta = catMeta[area];
+    const incomes = DB.incomes.filter(i=>i.date===fecha && i.category===area);
+    const cashIn = incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
+    const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
+    const totalIn = cashIn+yappyIn;
+    const clientsCount = incomes.length;
+    const pct = DB.settings.commissionPct[area] ?? 0;
+    const commissionAmount = totalIn * (pct/100);
+    const netSalon = totalIn - commissionAmount;
+
+    const existing = DB.cashClosings.find(c=>c.date===fecha && c.area===area);
+
+    return `
+      <div class="card service-col">
+        <div class="page-header" style="margin-bottom:8px;">
+          <h3 style="margin:0;"><span class="dot ${meta.dot}"></span> ${meta.label}</h3>
+          ${existing? `<span class="badge-locked">🔒 ${existing.closedAt}</span>` : ''}
+        </div>
+        <div class="cierre-summary" style="grid-template-columns:1fr 1fr;">
+          <div class="item"><div class="k">Efectivo</div><div class="v">${fmtMoney(cashIn)}</div></div>
+          <div class="item"><div class="k">Yappy</div><div class="v">${fmtMoney(yappyIn)}</div></div>
+          <div class="item"><div class="k">Total ingresos</div><div class="v" style="color:var(--teal-dark);">${fmtMoney(totalIn)}</div></div>
+          <div class="item"><div class="k">Clientes</div><div class="v">${clientsCount}</div></div>
+        </div>
+        <div style="margin-top:14px;">
+          <label>% Comisión trabajadora</label>
+          <input type="number" min="0" max="100" step="0.5" id="pct-${area}" value="${pct}" oninput="updateAreaCalc('${area}','${fecha}')">
+        </div>
+        <div class="cierre-summary" style="grid-template-columns:1fr 1fr;margin-top:10px;">
+          <div class="item"><div class="k">Pago a trabajadora</div><div class="v" id="pay-${area}" style="color:var(--gold);">${fmtMoney(commissionAmount)}</div></div>
+          <div class="item"><div class="k">Neto para el salón</div><div class="v" id="net-${area}" style="color:var(--teal-dark);">${fmtMoney(netSalon)}</div></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn small" onclick="closeAreaCashRegister('${fecha}','${area}')">${existing? '🔒 Volver a cerrar' : '🔒 Cerrar caja de ' + meta.label}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateAreaCalc(area, fecha){
+  const incomes = DB.incomes.filter(i=>i.date===fecha && i.category===area);
+  const totalIn = incomes.reduce((s,i)=>s+Number(i.price),0);
+  const pct = parseFloat(document.getElementById(`pct-${area}`).value)||0;
+  const commissionAmount = totalIn * (pct/100);
+  const netSalon = totalIn - commissionAmount;
+  document.getElementById(`pay-${area}`).textContent = fmtMoney(commissionAmount);
+  document.getElementById(`net-${area}`).textContent = fmtMoney(netSalon);
+}
+
+function closeAreaCashRegister(fecha, area){
+  const incomes = DB.incomes.filter(i=>i.date===fecha && i.category===area);
   const cashIn = incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
   const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
-  const cashOut = expenses.filter(e=>e.payment==='efectivo').reduce((s,e)=>s+Number(e.amount),0);
-  const yappyOut = expenses.filter(e=>e.payment==='yappy').reduce((s,e)=>s+Number(e.amount),0);
-  const totalIn = cashIn+yappyIn, totalOut = cashOut+yappyOut;
-  const clientsCount = new Set(incomes.filter(i=>i.client).map(i=>i.client.trim().toLowerCase())).size;
+  const totalIn = cashIn+yappyIn;
+  const clientsCount = incomes.length;
+  const pct = parseFloat(document.getElementById(`pct-${area}`).value)||0;
+  const commissionAmount = totalIn * (pct/100);
+  const netSalon = totalIn - commissionAmount;
 
-  const existingIdx = DB.cashClosings.findIndex(c=>c.date===fecha);
+  // guarda el % como valor por defecto para la próxima vez
+  DB.settings.commissionPct[area] = pct;
+
+  const existingIdx = DB.cashClosings.findIndex(c=>c.date===fecha && c.area===area);
   const record = {
     id: existingIdx>-1? DB.cashClosings[existingIdx].id : uid(),
     date: fecha,
+    area,
     cashIncome:cashIn, yappyIncome:yappyIn, totalIncome:totalIn,
-    cashExpense:cashOut, yappyExpense:yappyOut, totalExpense:totalOut,
-    net: totalIn-totalOut,
     clientsCount,
+    commissionPct: pct,
+    commissionAmount,
+    netSalon,
     closedAt: new Date().toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})
   };
   if(existingIdx>-1){
-    if(!confirm('Ya existe un cierre para este día. ¿Deseas actualizarlo con los datos actuales?')) return;
+    if(!confirm(`Ya existe un cierre de ${catMeta[area].label} para este día. ¿Deseas actualizarlo con los datos actuales?`)) return;
     DB.cashClosings[existingIdx] = record;
   } else {
     DB.cashClosings.push(record);
   }
   saveData(DB);
-  toast('Caja cerrada correctamente');
+  toast(`Caja de ${catMeta[area].label} cerrada correctamente`);
   renderCaja();
 }
 
 function renderCierreHistorial(){
-  const list = [...DB.cashClosings].sort((a,b)=>b.date.localeCompare(a.date));
+  const list = [...DB.cashClosings].sort((a,b)=> b.date.localeCompare(a.date) || a.area.localeCompare(b.area));
   const tbody = document.getElementById('cierreHistBody');
   if(list.length===0){
-    tbody.innerHTML = `<tr><td colspan="7" class="empty-msg">Aún no hay cierres guardados</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-msg">Aún no hay cierres guardados</td></tr>`;
     return;
   }
   tbody.innerHTML = list.map(c=>`
     <tr>
       <td>${c.date}</td>
+      <td><span class="pill ${c.area}">${catMeta[c.area]? catMeta[c.area].label : c.area}</span></td>
       <td style="color:var(--teal-dark);font-weight:600;">${fmtMoney(c.totalIncome)}</td>
-      <td style="color:var(--danger);font-weight:600;">${fmtMoney(c.totalExpense)}</td>
-      <td style="font-weight:600;">${fmtMoney(c.net)}</td>
       <td>${c.clientsCount}</td>
+      <td>${c.commissionPct}%</td>
+      <td style="color:var(--gold);font-weight:600;">${fmtMoney(c.commissionAmount)}</td>
+      <td style="font-weight:600;">${fmtMoney(c.netSalon)}</td>
       <td>${c.closedAt}</td>
       <td class="row-actions"><button onclick="document.getElementById('cajaFecha').value='${c.date}'; renderCaja();" title="Ver">👁</button></td>
     </tr>
