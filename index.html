@@ -672,7 +672,15 @@ function fallbackLogoSVG(){
 }
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
-function todayISO(){ return new Date().toISOString().slice(0,10); }
+// Usa la fecha LOCAL del dispositivo (no UTC). toISOString() convierte a UTC y
+// causaba que, en Panamá (UTC-5), a partir de las 7:00 PM ya se registrara el día siguiente.
+function toLocalISO(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function todayISO(){ return toLocalISO(new Date()); }
 function fmtMoney(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0); }
 function fmtDateHuman(iso){
   const d = new Date(iso+'T00:00:00');
@@ -789,8 +797,7 @@ function getPeriodRange(period, refDate){
     start = new Date(ref.getFullYear(), ref.getMonth(), 1);
     end = new Date(ref.getFullYear(), ref.getMonth()+1, 0);
   }
-  const toISO = d => d.toISOString().slice(0,10);
-  return {start: toISO(start), end: toISO(end)};
+  return {start: toLocalISO(start), end: toLocalISO(end)};
 }
 function inRange(dateStr, start, end){ return dateStr>=start && dateStr<=end; }
 
@@ -851,7 +858,7 @@ function last14Days(){
   const days = [];
   for(let i=13;i>=0;i--){
     const d = new Date(); d.setDate(d.getDate()-i);
-    days.push(d.toISOString().slice(0,10));
+    days.push(toLocalISO(d));
   }
   return days;
 }
@@ -1233,7 +1240,7 @@ function renderWeekList(){
     `${days[0].toLocaleDateString('es-PA',{day:'2-digit',month:'short'})} – ${days[6].toLocaleDateString('es-PA',{day:'2-digit',month:'short',year:'numeric'})}`;
 
   document.getElementById('weekList').innerHTML = days.map(d=>{
-    const dateStr = d.toISOString().slice(0,10);
+    const dateStr = toLocalISO(d);
     const apts = DB.appointments.filter(a=>a.date===dateStr).sort((a,b)=>a.time.localeCompare(b.time));
     return `<div class="week-day-block">
       <h4>${d.toLocaleDateString('es-PA',{weekday:'long',day:'2-digit',month:'short'})}</h4>
