@@ -3,2688 +3,1496 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MentoryCap — Economía y Finanzas Personales</title>
-<meta name="description" content="MentoryCap: contenido y acompañamiento con Oscar Rojas para entender mejor la economía global y tus finanzas personales, con un lenguaje simple y sin tecnicismos.">
-<link rel="icon" type="image/png" href="images/logo.png">
+<title>Cejas Lovely · Panel Administrativo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root{
-    --bg: #FAFBFC;
-    --bg-panel: #F1F4F8;
-    --bg-panel-2: #E4E9F0;
-    --border: #D6DDE6;
-    --text: #0E1620;
-    --text-muted: #5A6675;
-    --gold: #23639E;
-    --gold-dim: #A8C2DA;
-    --up: #0B8A6B;
-    --down: #C8483C;
-    --steel: #7C8B9C;
-    --radius: 6px;
-    --display: 'Space Grotesk', sans-serif;
-    --body: 'Inter', sans-serif;
-    --mono: 'JetBrains Mono', monospace;
+    --teal-dark:#0e7a6b;
+    --teal:#22a893;
+    --teal-mid:#4dc4ae;
+    --teal-light:#a9ecdd;
+    --mint:#eefdf9;
+    --ink:#1b1f1e;
+    --gray:#6b7573;
+    --gray-light:#9aa5a2;
+    --line:#e3efec;
+    --white:#ffffff;
+    --danger:#c0554d;
+    --danger-light:#fbe9e7;
+    --gold:#c9a227;
+    --shadow:0 8px 24px rgba(14,122,107,0.10);
+    --shadow-sm:0 2px 8px rgba(14,122,107,0.08);
+    --radius:16px;
   }
-
-  *{margin:0;padding:0;box-sizing:border-box;}
-
-  html{scroll-behavior:smooth;}
-
-  body{
-    background:
-      radial-gradient(1200px 600px at 15% -5%, rgba(35,99,158,0.07), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(124,139,156,0.10), transparent 55%),
-      var(--bg);
-    background-attachment:fixed;
-    color:var(--text);
-    font-family:var(--body);
-    line-height:1.6;
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  html,body{
+    font-family:'Poppins',sans-serif;
+    background:var(--mint);
+    color:var(--ink);
     -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
   }
-
-  a{color:inherit;text-decoration:none;}
-  ul{list-style:none;}
-
-  .container{
-    max-width:1120px;
-    margin:0 auto;
-    padding:0 24px;
+  h2,h3{font-family:'Playfair Display',serif;}
+  .brand h1,.brand .brand-script{
+    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   }
+  ::selection{background:var(--teal-light);}
+  button{font-family:'Poppins',sans-serif;cursor:pointer;}
+  input,select,textarea{font-family:'Poppins',sans-serif;}
 
-  .logo-img{
-    height:34px;
-    width:auto;
-    display:block;
-    background:linear-gradient(145deg, #1B222D 0%, #0D1218 100%);
-    border:1px solid rgba(255,255,255,0.09);
-    border-radius:9px;
-    padding:6px;
+  /* ---------- LAYOUT ---------- */
+  .app{
+    display:grid;
+    grid-template-columns:250px 1fr;
+    min-height:100vh;
   }
-  .footer-logo-img{height:28px;}
-  .logo-lockup{
+  .sidebar{
+    background:linear-gradient(160deg,var(--teal-dark),var(--teal) 60%,var(--teal-mid));
+    color:#fff;
+    padding:28px 18px;
     display:flex;
-    align-items:center;
-    gap:10px;
-  }
-  .logo-lockup .logo-text{
-    font-family:var(--display);
-    font-weight:700;
-    font-size:19px;
-    letter-spacing:-0.02em;
-  }
-  .logo-lockup .logo-text span{color:var(--gold);}
-  footer .logo-lockup .logo-text{font-size:16px;}
-
-    font-family:var(--mono);
-    font-size:12px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--gold);
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-bottom:16px;
-  }
-  .eyebrow::before{
-    content:'';
-    width:22px;height:2px;
-    background:linear-gradient(90deg, var(--gold), transparent);
-    display:inline-block;
-  }
-
-  h1,h2,h3{
-    font-family:var(--display);
-    font-weight:600;
-    letter-spacing:-0.01em;
-  }
-
-  /* ---------- NAV ---------- */
-  header{
+    flex-direction:column;
+    gap:26px;
     position:sticky;
     top:0;
-    z-index:100;
-    background:linear-gradient(180deg, rgba(16,22,31,0.96) 0%, rgba(11,15,22,0.94) 100%);
-    backdrop-filter:blur(12px);
-    border-bottom:1px solid rgba(255,255,255,0.07);
-    box-shadow:0 1px 0 rgba(35,99,158,0.35), 0 6px 24px rgba(14,22,32,0.14);
-    color:#E9EEF4;
-  }
-  header .logo-text, header .logo, header .nav-links, header .nav-link-btn{color:#C3CDD9;}
-  header .nav-links a:hover, header .nav-link-btn:hover{color:#FFFFFF;}
-  header .logo-text{color:#F2F6FA;}
-  header .logo-lockup .logo-text span{color:#5FA8E0;}
-  nav{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:18px 24px;
-    max-width:1120px;
-    margin:0 auto;
-  }
-  .logo{
-    font-family:var(--display);
-    font-weight:700;
-    font-size:19px;
-    letter-spacing:-0.02em;
-  }
-  .logo span{color:var(--gold);}
-  .nav-links{
-    display:flex;
-    gap:32px;
-    font-size:14px;
-    color:var(--text-muted);
-  }
-  .nav-links a:hover{color:var(--text);}
-  .nav-link-btn{
-    background:none;
-    border:none;
-    color:var(--text-muted);
-    font-family:var(--body);
-    font-size:14px;
-    cursor:pointer;
-    padding:0;
-    -webkit-appearance:none;
-    appearance:none;
-  }
-  .nav-link-btn:hover{color:var(--text);}
-  .nav-cta{
-    background:linear-gradient(180deg, #2C74B4 0%, #1D5488 100%);
-    color:#FFFFFF;
-    font-weight:600;
-    font-size:13px;
-    padding:10px 18px;
-    border-radius:var(--radius);
-    white-space:nowrap;
-    border:1px solid rgba(255,255,255,0.16);
-  }
-  .nav-cta:hover{background:#17497A;}
-  .nav-mobile-hide{display:flex;}
-  @media(max-width:760px){
-    .nav-mobile-hide{display:none;}
-  }
-
-  /* ---------- HERO ---------- */
-  .hero-bg{
-    position:relative;
-    min-height:640px;
-    display:flex;
-    align-items:center;
-    overflow:hidden;
-    border-bottom:1px solid var(--border);
-    padding:60px 0;
-  }
-  .hero-bg-photo{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center 20%;
-    z-index:0;
-    opacity:1;
-  }
-  .hero-overlay{
-    position:absolute;
-    inset:0;
-    background:linear-gradient(90deg, var(--bg) 0%, rgba(255,255,255,0.88) 30%, rgba(255,255,255,0.68) 55%, rgba(255,255,255,0.42) 100%);
-    z-index:1;
-  }
-  .hero-content{
-    position:relative;
-    z-index:2;
-    max-width:600px;
-  }
-  @media(max-width:760px){
-    .hero-bg{min-height:680px;align-items:flex-end;padding-bottom:50px;}
-    .hero-bg-photo{opacity:0.95;object-position:top center;}
-    .hero-overlay{background:linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.4) 55%, rgba(255,255,255,0.95) 100%);}
-    .hero-content{max-width:100%;}
-  }
-  .hero h1{
-    font-size:42px;
-    line-height:1.14;
-    margin-bottom:14px;
-  }
-  .hero h1 em{
-    font-style:normal;
-    color:var(--gold);
-  }
-  .hero-subtitle{
-    font-size:18px;
-    color:var(--text-muted);
-    font-weight:400;
-    margin-bottom:18px;
-  }
-  .hero-motto{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:28px;
-    flex-wrap:wrap;
-  }
-  .hero-motto span{
-    font-family:var(--display);
-    font-weight:700;
-    font-size:20px;
-    letter-spacing:0.02em;
-    background:linear-gradient(180deg, #2C74B4 0%, #1D5488 100%);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-  }
-  .hero-motto i{
-    font-style:normal;
-    color:var(--text-muted);
-    opacity:0.5;
-    font-size:14px;
-  }
-  .hero p.lead{
-    font-size:17px;
-    color:var(--text-muted);
-    max-width:520px;
-    margin-bottom:32px;
-  }
-  .hero-actions{
-    display:flex;
-    gap:14px;
-    flex-wrap:wrap;
-    margin-bottom:40px;
-  }
-  .btn{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:14px 24px;
-    border-radius:var(--radius);
-    font-weight:600;
-    font-size:14px;
-    cursor:pointer;
-    border:1px solid transparent;
-    transition:transform .15s ease, background .15s ease, border-color .15s ease;
-    background:none;
-    -webkit-appearance:none;
-    appearance:none;
-    font-family:var(--body);
-    line-height:1.2;
-  }
-  .btn:hover{transform:translateY(-1px);}
-  .btn-primary{
-    background:linear-gradient(180deg, #2C74B4 0%, #23639E 55%, #1D5488 100%);
-    color:#FFFFFF;
-    box-shadow:0 1px 0 rgba(255,255,255,0.22) inset, 0 6px 18px rgba(35,99,158,0.28);
-  }
-  .btn-primary:hover{background:linear-gradient(180deg, #337FC2 0%, #2A6EAC 55%, #215E96 100%);}
-  .btn-outline{background:transparent;border-color:var(--border);color:var(--text);}
-  .btn-outline:hover{border-color:var(--gold);color:var(--gold);background:rgba(35,99,158,0.06);}
-
-  .hero-stats{
-    display:flex;
-    gap:32px;
-    font-family:var(--mono);
-  }
-  .hero-stat b{
-    display:block;
-    font-size:22px;
-    color:var(--text);
-  }
-  .hero-stat span{
-    font-size:12px;
-    color:var(--text-muted);
-  }
-  .up{color:var(--up);}
-  .down{color:var(--down);}
-
-  /* chart visual */
-  .chart-panel{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:20px;
-  }
-  .chart-panel-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-family:var(--mono);
-    font-size:12px;
-    color:var(--text-muted);
-    margin-bottom:14px;
-  }
-  .chart-panel-head b{color:var(--text);}
-  svg.candles rect.candle-up{fill:var(--up);}
-  svg.candles rect.candle-down{fill:var(--down);}
-  svg.candles line{stroke-width:1.5;}
-  svg.candles line.wick-up{stroke:var(--up);}
-  svg.candles line.wick-down{stroke:var(--down);}
-
-  /* ---------- SECTION GENERIC ---------- */
-  section{padding:88px 0;}
-  .section-head{
-    max-width:640px;
-    margin-bottom:56px;
-  }
-  .section-head h2{font-size:32px;}
-  .section-head p{color:var(--text-muted);margin-top:14px;font-size:15.5px;}
-
-  /* ---------- HISTORIA / TIMELINE ---------- */
-  #historia{border-bottom:1px solid var(--border);background:linear-gradient(180deg, transparent, rgba(35,99,158,0.02));}
-  .timeline{
-    position:relative;
-    border-left:1px solid var(--border);
-    padding-left:36px;
-    display:flex;
-    flex-direction:column;
-    gap:44px;
-  }
-  .t-item{position:relative;}
-  .t-item::before{
-    content:'';
-    position:absolute;
-    left:-42px;
-    top:4px;
-    width:11px;height:11px;
-    border-radius:50%;
-    background:var(--bg);
-    border:2px solid var(--gold);
-  }
-  .t-date{
-    font-family:var(--mono);
-    font-size:12.5px;
-    color:var(--gold);
-    letter-spacing:0.06em;
-    margin-bottom:6px;
-    display:block;
-  }
-  .t-item h3{font-size:19px;margin-bottom:8px;font-weight:600;}
-  .t-item p{color:var(--text-muted);font-size:15px;max-width:620px;}
-
-  /* ---------- HISTORIA: cita grande, highlights, chips ---------- */
-  .story-lead{
-    font-family:var(--display);
-    font-size:24px;
-    font-weight:600;
-    line-height:1.45;
-    color:var(--text);
-    max-width:680px;
-    margin-bottom:56px;
-    padding-left:22px;
-    border-left:3px solid var(--gold);
-  }
-  .story-lead span{color:var(--gold);}
-  .story-highlight{
-    border:1px dashed var(--gold-dim);
-    border-radius:10px;
-    padding:22px 26px;
-    background:rgba(35,99,158,0.06);
-    margin:8px 0 40px;
-    max-width:680px;
-  }
-  .story-highlight p{
-    color:var(--text);
-    font-size:16px;
-    line-height:1.6;
-    font-family:var(--display);
-    font-weight:500;
-  }
-  .story-highlight.beliefs p{
-    color:var(--text-muted);
-    font-family:var(--body);
-    font-weight:400;
-    font-size:14.5px;
-  }
-  .story-highlight .tag{
-    display:block;
-    font-family:var(--mono);
-    font-size:11px;
-    letter-spacing:0.06em;
-    color:var(--gold);
-    text-transform:uppercase;
-    margin-bottom:10px;
-  }
-  .story-chips{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin:18px 0 8px;
-  }
-  .story-chips span{
-    font-family:var(--mono);
-    font-size:12px;
-    color:var(--gold);
-    border:1px solid rgba(35,99,158,0.3);
-    background:rgba(35,99,158,0.08);
-    padding:5px 12px;
-    border-radius:5px;
-  }
-  .story-closing{
-    font-family:var(--display);
-    font-size:21px;
-    font-weight:600;
-    line-height:1.5;
-    color:var(--text);
-    max-width:640px;
-    margin-top:48px;
-    padding-top:32px;
-    border-top:1px solid var(--border);
-  }
-  .story-closing span{color:var(--gold);}
-  .story-note{
-    font-family:var(--mono);
-    font-size:12.5px;
-    color:var(--text-muted);
-    margin-top:16px;
-  }
-
-  .t-item-img{
-    width:100%;
-    max-width:620px;
-    border-radius:10px;
-    border:1px solid var(--border);
-    margin-top:18px;
-    display:block;
-  }
-  .story-gallery{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
-    max-width:620px;
-    margin-top:18px;
-  }
-  .story-gallery img{
-    width:100%;
-    aspect-ratio:1/1;
-    object-fit:cover;
-    border-radius:10px;
-    border:1px solid var(--border);
-    display:block;
-  }
-  .story-gallery-4{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
-    max-width:620px;
-    margin-top:18px;
-  }
-  .story-gallery-4 img{
-    width:100%;
-    aspect-ratio:1/1;
-    object-fit:cover;
-    border-radius:10px;
-    border:1px solid var(--border);
-    display:block;
-  }
-  .story-caption{
-    font-family:var(--mono);
-    font-size:11px;
-    color:var(--text-muted);
-    margin-top:8px;
-  }
-
-  /* ---------- ENLACES Y RECURSOS ---------- */
-  .links-groups{
-    max-width:640px;
-    margin:28px auto 0;
-  }
-  .links-group{margin-bottom:26px;}
-  .links-group:last-child{margin-bottom:0;}
-  .links-group-label{
-    font-family:var(--mono);
-    font-size:10.5px;
-    color:var(--gold);
-    text-transform:uppercase;
-    letter-spacing:0.07em;
-    padding-bottom:8px;
-    margin-bottom:2px;
-    border-bottom:1px solid var(--border);
-  }
-  .link-row{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:14px;
-    padding:12px 4px;
-    border-bottom:1px solid var(--border);
-    transition:padding-left .15s ease, background .15s ease;
-  }
-  .link-row:last-child{border-bottom:none;}
-  .link-row:hover{padding-left:8px;background:rgba(35,99,158,0.05);}
-  .link-row-text{
-    display:flex;
-    align-items:baseline;
-    gap:9px;
-    flex-wrap:wrap;
-    min-width:0;
-  }
-  .link-row-name{font-size:14px;font-weight:600;color:var(--text);}
-  .link-row-desc{font-size:12px;color:var(--text-muted);}
-  .link-row-arrow{
-    font-family:var(--mono);
-    font-size:13px;
-    color:var(--text-muted);
-    flex-shrink:0;
-    transition:color .15s ease;
-  }
-  .link-row:hover .link-row-arrow{color:var(--gold);}
-
-  .fab-wrap{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    z-index:150;
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    gap:12px;
-  }
-  .fab-btn{
-    width:56px;height:56px;
-    border-radius:50%;
-    background:linear-gradient(145deg, #2C74B4 0%, #1D5488 100%);
-    color:#FFFFFF;
-    border:1px solid rgba(255,255,255,0.18);
-    font-size:22px;
-    cursor:pointer;
-    box-shadow:0 10px 26px rgba(35,99,158,0.34);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:transform .15s ease;
-  }
-  .fab-btn:hover{transform:scale(1.06);}
-  .fab-menu{
-    display:none;
-    flex-direction:column;
-    gap:8px;
-    background:#FFFFFF;
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:10px;
-    box-shadow:0 12px 32px rgba(20,22,27,0.14);
-    min-width:190px;
-  }
-  .fab-menu.open{display:flex;}
-  .fab-item{
-    display:block;
-    width:100%;
-    text-align:left;
-    background:none;
-    border:none;
-    color:var(--text);
-    font-family:var(--body);
-    font-size:14px;
-    padding:10px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    text-decoration:none;
-    -webkit-appearance:none;
-    appearance:none;
-  }
-  .fab-item:hover{background:var(--bg);color:var(--gold);}
-  .fab-item-chat{
-    border-top:1px solid var(--border);
-    margin-top:2px;
-    padding-top:12px;
-    color:var(--gold);
-    font-weight:600;
-  }
-
-  /* ---------- VENTANITA DE CHAT ---------- */
-  .chat-backdrop{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(14,22,32,0.45);
-    z-index:159;
-  }
-  .chat-backdrop.open{display:block;}
-  .chat-window{
-    display:none;
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
-    z-index:160;
-    width:340px;
-    max-width:calc(100vw - 40px);
-    max-height:calc(100vh - 40px);
-    overflow-y:auto;
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:0 20px 50px rgba(20,22,27,0.18);
-  }
-  .chat-window.open{display:block;}
-  .chat-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:14px 16px;
-    background:var(--bg-panel-2);
-    border-bottom:1px solid var(--border);
-  }
-  .chat-header-info{display:flex;align-items:center;gap:10px;}
-  .chat-avatar{width:34px;height:34px;object-fit:contain;background:#14161B;border-radius:50%;padding:6px;}
-  .chat-title{font-family:var(--display);font-weight:600;font-size:13.5px;}
-  .chat-status{font-family:var(--mono);font-size:10.5px;color:var(--text-muted);display:flex;align-items:center;gap:5px;}
-  .chat-status .dot{width:6px;height:6px;border-radius:50%;background:var(--up);display:inline-block;}
-  .chat-close{background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;}
-  .chat-close:hover{color:var(--gold);}
-  .chat-body{padding:16px;}
-  .chat-bubble{
-    background:var(--bg);
-    border:1px solid var(--border);
-    border-radius:10px;
-    border-top-left-radius:2px;
-    padding:12px 14px;
-    font-size:13px;
-    color:var(--text-muted);
-    margin-bottom:14px;
-    line-height:1.5;
-  }
-  #chat-form{display:flex;flex-direction:column;gap:8px;}
-  #chat-form input, #chat-form textarea{
-    width:100%;
-    background:var(--bg);
-    border:1px solid var(--border);
-    color:var(--text);
-    padding:10px 12px;
-    border-radius:8px;
-    font-size:13.5px;
-    font-family:var(--body);
-    resize:none;
-  }
-  #chat-form input:focus, #chat-form textarea:focus{outline:none;border-color:var(--gold-dim);}
-  #chat-form input::placeholder, #chat-form textarea::placeholder{color:var(--text-muted);opacity:0.75;}
-  #chat-form .btn{width:100%;justify-content:center;margin-top:2px;font-size:13px;padding:11px;}
-  #chat-msg{
-    font-family:var(--mono);
-    font-size:11.5px;
-    display:none;
-    padding:9px 10px;
-    border-radius:6px;
-    margin-top:4px;
-  }
-  #chat-msg.ok{display:block;background:rgba(11,138,107,0.12);color:var(--up);border:1px solid rgba(11,138,107,0.3);}
-  #chat-msg.err{display:block;background:rgba(200,72,60,0.12);color:var(--down);border:1px solid rgba(200,72,60,0.3);}
-  @media(max-width:480px){
-    .fab-wrap{right:14px;bottom:14px;}
-  }
-  #mercado{border-bottom:1px solid var(--border);}
-  .market-clock-box{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:20px 22px;
-    margin-top:24px;
-  }
-  .market-clock-top{
-    display:flex;
-    align-items:baseline;
-    gap:10px;
-    margin-bottom:14px;
-  }
-  .clock-time{
-    font-family:var(--mono);
-    font-size:22px;
-    font-weight:600;
-    color:var(--gold);
-    letter-spacing:0.02em;
-  }
-  .clock-label{
-    font-family:var(--mono);
-    font-size:11px;
-    color:var(--text-muted);
-    text-transform:uppercase;
-    letter-spacing:0.03em;
-  }
-  .market-strip-sessions{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    flex-wrap:wrap;
-  }
-  .session-chip{
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-    font-family:var(--mono);
-    font-size:11px;
-    padding:5px 10px;
-    border-radius:20px;
-    border:1px solid var(--border);
-    color:var(--text-muted);
-  }
-  .session-chip.open{border-color:rgba(11,138,107,0.4);color:var(--up);background:rgba(11,138,107,0.08);}
-  .session-dot{
-    width:6px;height:6px;
-    border-radius:50%;
-    flex-shrink:0;
-  }
-  .session-dot.open{background:var(--up);box-shadow:0 0 0 2px rgba(11,138,107,0.2);}
-  .session-dot.closed{background:var(--text-muted);opacity:0.5;}
-  .stocks-range{
-    display:inline-flex;
-    gap:4px;
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:9px;
-    padding:3px;
-    margin-bottom:20px;
-  }
-  .stocks-range-btn{
-    font-family:var(--mono);
-    font-size:12px;
-    padding:7px 16px;
-    border-radius:7px;
-    border:none;
-    background:none;
-    color:var(--text-muted);
-    cursor:pointer;
-    -webkit-appearance:none;
-    appearance:none;
-  }
-  .stocks-range-btn.active{background:var(--bg);color:var(--gold);}
-  .stocks-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:16px;
-  }
-  @media(max-width:1000px){.stocks-grid{grid-template-columns:repeat(2,1fr);}}
-  @media(max-width:560px){.stocks-grid{grid-template-columns:1fr;}}
-  .stock-card{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:18px;
-  }
-  .stock-top{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    margin-bottom:6px;
-  }
-  .stock-symbol{font-family:var(--display);font-weight:600;font-size:15px;}
-  .stock-name{font-size:11px;color:var(--text-muted);margin-top:2px;}
-  .stock-price-wrap{text-align:right;}
-  .stock-price{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text);}
-  .stock-change{
-    font-family:var(--mono);
-    font-size:11.5px;
-    font-weight:600;
-    padding:2px 7px;
-    border-radius:5px;
-    display:inline-block;
-    margin-top:4px;
-  }
-  .stock-change.up{color:var(--up);background:rgba(11,138,107,0.12);}
-  .stock-change.down{color:var(--down);background:rgba(200,72,60,0.12);}
-  .stock-chart{width:100%;height:60px;margin-top:6px;display:block;}
-  #historia-cta{border-bottom:1px solid var(--border);padding:56px 0;}
-  #youtube-cta{border-bottom:1px solid var(--border);padding:56px 0;}
-  .options-stack{
-    display:flex;
-    flex-direction:column;
-    gap:16px;
-    margin-top:36px;
-    max-width:720px;
-    margin-left:auto;
-    margin-right:auto;
-  }
-  .option-item{
-    background:linear-gradient(180deg, #FFFFFF 0%, var(--bg-panel) 100%);
-    border:1px solid var(--border);
-    border-radius:14px;
-    overflow:hidden;
-    transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
-  }
-  .option-item:hover{border-color:var(--gold-dim);box-shadow:0 8px 22px rgba(14,22,32,0.07);}
-  .option-item[open]{
-    border-color:var(--gold);
-    box-shadow:0 10px 30px rgba(35,99,158,0.14);
-  }
-  .option-item summary{
-    list-style:none;
-    cursor:pointer;
-    display:flex;
-    align-items:flex-start;
-    gap:16px;
-    padding:22px;
-    height:158px;
-  }
-  @media(max-width:400px){
-    .option-item summary{padding:20px 16px;height:164px;}
-  }
-  .option-item summary::-webkit-details-marker{display:none;}
-  .option-num{
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    background:linear-gradient(145deg, #1B222D 0%, #0D1218 100%);
-    border:1px solid rgba(255,255,255,0.1);
-    color:#E9EEF4;
-    font-family:var(--mono);
-    font-weight:700;
-    font-size:14px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-    box-shadow:0 3px 10px rgba(14,22,32,0.22);
-  }
-  .option-item[open] .option-num{
-    background:linear-gradient(145deg, #2C74B4 0%, #1D5488 100%);
-    border-color:rgba(255,255,255,0.2);
-  }
-  .option-summary-text{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    gap:6px;
-    flex:1;
-    min-width:0;
-    height:100%;
-  }
-  .option-summary-text strong{font-size:16px;color:var(--text);}
-  .option-tagline{
-    font-size:13px;
-    color:var(--text-muted);
-    line-height:1.4;
-    display:-webkit-box;
-    -webkit-line-clamp:4;
-    -webkit-box-orient:vertical;
-    overflow:hidden;
-  }
-  .option-chevron{
-    font-family:var(--mono);
-    color:var(--text-muted);
-    flex-shrink:0;
-    margin-top:2px;
-    transition:transform .2s ease;
-  }
-  .option-item[open] .option-chevron{transform:rotate(180deg);color:var(--gold);}
-  .option-body{
-    padding:0 22px 26px;
-    border-top:1px solid var(--border);
-    padding-top:20px;
-  }
-  .option-body h3{font-size:18px;margin-bottom:12px;}
-  .option-body p{color:var(--text-muted);font-size:14.5px;line-height:1.6;}
-  .option-body h4{
-    font-family:var(--mono);
-    font-size:12px;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
-    color:var(--text);
-    margin:20px 0 10px;
-  }
-  .option-body ul{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    margin-bottom:14px;
-  }
-  .option-body li{
-    font-size:14px;
-    color:var(--text-muted);
-    padding-left:20px;
-    position:relative;
-    line-height:1.5;
-  }
-  .option-body li::before{
-    content:'—';
-    position:absolute;
-    left:0;
-    color:var(--gold-dim);
-  }
-  .option-body .youtube-embed-wrap{margin:16px auto 0;max-width:100%;}
-  .youtube-embed-wrap{
-    max-width:720px;
-    margin:32px auto 0;
-    aspect-ratio:16/9;
-    border-radius:12px;
-    overflow:hidden;
-    border:1px solid var(--border);
-    background:#000;
-  }
-  .youtube-embed-wrap iframe{width:100%;height:100%;display:block;border:none;}
-  .youtube-btn{
-    background:linear-gradient(180deg, #2C74B4 0%, #23639E 55%, #1D5488 100%);
-    color:#FFFFFF;
-    box-shadow:0 1px 0 rgba(255,255,255,0.22) inset, 0 6px 18px rgba(35,99,158,0.28);
-  }
-  .youtube-btn:hover{background:linear-gradient(180deg, #337FC2 0%, #2A6EAC 55%, #215E96 100%);}
-  .historia-cta-box{
-    max-width:480px;
-    margin:0 auto;
-    text-align:center;
-  }
-  .historia-cta-box .btn{
-    display:flex;
-    width:max-content;
-    margin:0 auto;
-  }
-  .historia-cta-photo{
-    width:168px;
-    height:168px;
-    border-radius:50%;
-    object-fit:cover;
-    object-position:top center;
-    border:3px solid var(--gold-dim);
-    margin:0 auto 18px;
-    display:block;
-  }
-  .historia-cta-eyebrow{
-    font-family:var(--mono);
-    font-size:11.5px;
-    color:var(--gold);
-    letter-spacing:0.08em;
-    margin-bottom:10px;
-  }
-  .historia-cta-box h2{font-size:24px;margin-bottom:14px;}
-  .historia-cta-box p{color:var(--text-muted);font-size:14.5px;line-height:1.6;margin-bottom:26px;}
-  .top20-card{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:26px;
-  }
-  .top20-card h3{font-size:16.5px;margin-bottom:4px;}
-  .top20-list{margin-top:16px;display:flex;flex-direction:column;}
-  .top20-row{
-    display:grid;
-    grid-template-columns:26px 24px 1fr auto auto;
-    align-items:center;
-    gap:12px;
-    padding:10px 4px;
-    border-bottom:1px solid var(--border);
-    font-size:13.5px;
-    cursor:pointer;
-    border-radius:6px;
-    transition:background .12s ease;
-  }
-  .top20-row:hover{background:rgba(35,99,158,0.06);}
-  .top20-row.active{background:rgba(35,99,158,0.1);}
-  .top20-row:last-child{border-bottom:none;}
-  .top20-rank{font-family:var(--mono);color:var(--text-muted);font-size:12px;}
-  .top20-icon{
-    width:24px;height:24px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:var(--mono);
-    font-size:8.5px;
-    font-weight:700;
-  }
-  .top20-name{color:var(--text);font-weight:500;}
-  .top20-name .sym{color:var(--text-muted);font-family:var(--mono);font-size:11px;margin-left:6px;text-transform:uppercase;}
-  .top20-price{font-family:var(--mono);color:var(--text);text-align:right;white-space:nowrap;}
-  .top20-change{font-family:var(--mono);font-size:12px;text-align:right;min-width:58px;white-space:nowrap;}
-  .top20-change.up{color:var(--up);}
-  .top20-change.down{color:var(--down);}
-  .crypto-detail-card{
-    margin-top:20px;
-    position:relative;
-    max-width:420px;
-  }
-  .crypto-detail-close{
-    position:absolute;
-    top:14px;
-    right:14px;
-    background:none;
-    border:none;
-    color:var(--text-muted);
-    font-size:14px;
-    cursor:pointer;
-  }
-  .crypto-detail-close:hover{color:var(--gold);}
-  @media(max-width:560px){
-    .top20-row{grid-template-columns:20px 20px 1fr auto;font-size:12.5px;}
-    .top20-change{display:none;}
-    .crypto-detail-card{max-width:100%;}
-  }
-  /* ---------- HERRAMIENTAS ---------- */
-  #herramientas{border-bottom:1px solid var(--border);}
-  .tools-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:24px;
-    margin-top:32px;
-  }
-  @media(max-width:900px){.tools-grid{grid-template-columns:1fr;}}
-  .tool-card{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:28px;
-  }
-  .tool-card h3{font-size:17px;margin-bottom:6px;}
-  .tool-card .tool-desc{color:var(--text-muted);font-size:13.5px;margin-bottom:20px;}
-
-  /* Quiz */
-  .quiz-card{
-    background:var(--bg-panel);
-    border:1px solid var(--gold-dim);
-    border-radius:12px;
-    padding:32px;
-    margin-top:32px;
-    max-width:680px;
-  }
-  .quiz-progress{
-    font-family:var(--mono);
-    font-size:11.5px;
-    color:var(--gold);
-    letter-spacing:0.05em;
-    margin-bottom:14px;
-  }
-  .quiz-question h3{font-size:19px;margin-bottom:18px;}
-  .quiz-options{display:flex;flex-direction:column;gap:10px;}
-  .quiz-option{
-    text-align:left;
-    padding:14px 16px;
-    border:1px solid var(--border);
-    border-radius:8px;
-    background:var(--bg);
-    color:var(--text);
-    cursor:pointer;
-    font-size:14.5px;
-    font-family:var(--body);
-    -webkit-appearance:none;
-    appearance:none;
-    transition:border-color .15s ease, background .15s ease;
-  }
-  .quiz-option:hover{border-color:var(--gold);background:rgba(35,99,158,0.06);}
-  .quiz-result{display:none;text-align:center;padding:12px 0;}
-  .quiz-result.show{display:block;}
-  .quiz-result .result-tag{
-    font-family:var(--mono);
-    font-size:11.5px;
-    color:var(--gold);
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    margin-bottom:10px;
-  }
-  .quiz-result h3{font-size:23px;margin-bottom:12px;}
-  .quiz-result p{color:var(--text-muted);font-size:14.5px;margin-bottom:22px;max-width:520px;margin-left:auto;margin-right:auto;}
-  .quiz-restart{
-    display:block;
-    margin:16px auto 0;
-    background:none;
-    border:none;
-    font-family:var(--mono);
-    font-size:12px;
-    color:var(--text-muted);
-    text-decoration:underline;
-    cursor:pointer;
-  }
-
-  /* Calculadora de riesgo */
-  .calc-field{margin-bottom:14px;}
-  .calc-field label{
-    display:block;
-    font-size:12.5px;
-    color:var(--text-muted);
-    margin-bottom:6px;
-    font-family:var(--mono);
-  }
-  .calc-field input{
-    width:100%;
-    background:var(--bg);
-    border:1px solid var(--border);
-    color:var(--text);
-    padding:11px 13px;
-    border-radius:6px;
-    font-size:14.5px;
-  }
-  .calc-field input:focus{outline:none;border-color:var(--gold-dim);}
-  .calc-results{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-top:20px;
-  }
-  .calc-result-box{
-    background:var(--bg);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:16px 10px;
-    text-align:center;
-  }
-  .calc-result-box .val{
-    font-family:var(--mono);
-    font-size:21px;
-    color:var(--gold);
-    font-weight:600;
-    display:block;
-  }
-  .calc-result-box .lbl{
-    font-size:10.5px;
-    color:var(--text-muted);
-    text-transform:uppercase;
-    letter-spacing:0.04em;
-    margin-top:6px;
-    display:block;
-  }
-  .calc-note{
-    font-family:var(--mono);
-    font-size:11px;
-    color:var(--text-muted);
-    margin-top:16px;
-    line-height:1.5;
-  }
-
-  /* Calendario económico */
-  .calendar-embed{
-    border-radius:8px;
-    overflow:hidden;
-    border:1px solid var(--border);
-  }
-  .calendar-tabs{
-    display:flex;
-    gap:8px;
-    margin-bottom:14px;
-  }
-  .calendar-tab{
-    font-family:var(--mono);
-    font-size:12px;
-    padding:7px 16px;
-    border-radius:6px;
-    border:1px solid var(--border);
-    background:var(--bg);
-    color:var(--text-muted);
-    cursor:pointer;
-    -webkit-appearance:none;
-    appearance:none;
-  }
-  .calendar-tab.active{border-color:var(--gold);color:var(--gold);background:rgba(35,99,158,0.08);}
-
-  /* ---------- PILARES ---------- */
-  #hoy{border-bottom:1px solid var(--border);}
-  .roadmap{
-    position:relative;
-    height:260px;
-    margin:40px 0 50px;
-  }
-  .roadmap-path{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:0;
-  }
-  .road-base{stroke:#EDEBE2;stroke-width:26;}
-  .road-lane{stroke:#C9C5B8;stroke-width:2;stroke-dasharray:10 12;}
-  .roadmap-node{
-    position:absolute;
-    z-index:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:8px;
-    text-align:center;
-    transform:translateX(-50%);
-    width:110px;
-  }
-  .roadmap-stem{width:2px;background:var(--border);}
-  .roadmap-dot{
-    width:50px;
-    height:50px;
-    border-radius:50%;
-    background:var(--bg-panel);
-    border:2px solid var(--gold-dim);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:var(--mono);
-    font-weight:700;
-    font-size:16px;
-    color:var(--gold);
-    box-shadow:0 4px 14px rgba(20,22,27,0.12);
-    flex-shrink:0;
-  }
-  .roadmap-dot.start{background:var(--bg);border-color:var(--border);font-size:17px;}
-  .roadmap-dot.end{background:#FBF6E9;border-color:var(--gold);color:var(--text);font-size:20px;}
-  .roadmap-node span{font-size:11px;color:var(--text-muted);line-height:1.3;}
-  @media(max-width:700px){
-    .roadmap{height:auto;display:flex;flex-direction:column;align-items:flex-start;gap:22px;padding-left:10px;}
-    .roadmap-path{display:none;}
-    .roadmap-node{
-      position:relative;
-      flex-direction:row;
-      text-align:left;
-      gap:14px;
-      width:auto;
-      transform:none;
-      left:auto !important;
-      top:auto !important;
-    }
-    .roadmap-node .roadmap-stem{display:none;}
-    .roadmap-node:not(:last-child)::after{
-      content:'';
-      position:absolute;
-      left:24px;
-      top:50px;
-      width:0;
-      height:22px;
-      border-left:2px dashed var(--border);
-    }
-  }
-
-  .pilares{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:24px;
-  }
-  @media(max-width:860px){.pilares{grid-template-columns:1fr;}}
-  .pilar{
-    background:linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:0 28px 28px;
-    overflow:hidden;
-    transition:transform .2s ease, border-color .2s ease;
-    display:flex;
-    flex-direction:column;
-  }
-  .pilar > .btn{margin-top:auto;align-self:flex-start;}
-  .pilar:hover{
-    transform:translateY(-4px);
-    border-color:var(--gold-dim);
-  }
-  .pilar-art{
-    margin:0 -28px 24px;
-    height:150px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:
-      radial-gradient(circle at 50% 30%, rgba(35,99,158,0.16), transparent 65%),
-      var(--bg-panel);
-    border-bottom:1px solid var(--border);
-  }
-  .pilar .num{
-    font-family:var(--mono);
-    color:var(--gold-dim);
-    font-size:13px;
-    margin-bottom:14px;
-    display:block;
-  }
-  .pilar h3{font-size:19px;margin-bottom:10px;}
-  .pilar p{color:var(--text-muted);font-size:14.5px;}
-
-  /* ---------- CATALOGO ---------- */
-  .catalogo{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:24px;
-    align-items:stretch;
-  }
-  @media(max-width:900px){.catalogo{grid-template-columns:1fr;}}
-  .plan{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:30px;
-    display:flex;
-    flex-direction:column;
-  }
-  .plan.featured{
-    border-color:var(--gold-dim);
-    background:linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
-    position:relative;
-  }
-  .plan.featured::before{
-    content:'RECOMENDADO';
-    position:absolute;
-    top:-11px;
-    left:30px;
-    background:var(--gold);
-    color:#FFFFFF;
-    font-family:var(--mono);
-    font-size:10.5px;
-    letter-spacing:0.08em;
-    padding:4px 10px;
-    border-radius:4px;
-    font-weight:600;
-  }
-  .plan-tag{
-    font-family:var(--mono);
-    font-size:12px;
-    color:var(--text-muted);
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    margin-bottom:10px;
-  }
-  .plan h3{font-size:21px;margin-bottom:6px;}
-  .plan .price{
-    font-family:var(--mono);
-    font-size:28px;
-    margin:14px 0 4px;
-  }
-  .plan .price small{
-    font-size:13px;
-    color:var(--text-muted);
-    font-weight:400;
-  }
-  .plan .price-sub{
-    font-size:13px;
-    color:var(--text-muted);
-    margin-bottom:20px;
-  }
-  .plan ul{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    margin-bottom:26px;
-    flex-grow:1;
-  }
-  .plan li{
-    font-size:14px;
-    color:var(--text-muted);
-    padding-left:20px;
-    position:relative;
-  }
-  .plan li::before{
-    content:'—';
-    position:absolute;
-    left:0;
-    color:var(--gold-dim);
-  }
-  .plan .btn{width:100%;justify-content:center;}
-
-  .split-visual{
-    font-family:var(--mono);
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:14px 0 18px;
-  }
-  .split-bar{
-    flex-grow:1;
-    height:8px;
-    border-radius:4px;
-    background:var(--border);
-    overflow:hidden;
-    display:flex;
-  }
-  .split-bar span{display:block;height:100%;}
-  .split-bar .inv{background:var(--up);width:70%;}
-  .split-bar .ges{background:var(--gold-dim);width:30%;}
-  .split-legend{
-    display:flex;
-    justify-content:space-between;
-    font-size:12px;
-    color:var(--text-muted);
-    margin-bottom:20px;
-  }
-
-  /* ---------- FORM ---------- */
-  #comunidad{
-    border-bottom:1px solid var(--border);
-    background:var(--bg-panel);
-  }
-  .form-wrap{
-    display:grid;
-    grid-template-columns:0.9fr 1.1fr;
-    gap:56px;
-    align-items:start;
-  }
-  @media(max-width:860px){.form-wrap{grid-template-columns:1fr;}}
-  .form-side h2{font-size:30px;margin-bottom:16px;}
-  .form-side p{color:var(--text-muted);font-size:15px;margin-bottom:14px;}
-  .form-note{
-    font-family:var(--mono);
-    font-size:12.5px;
-    color:var(--gold);
-    border:1px dashed var(--gold-dim);
-    border-radius:6px;
-    padding:14px 16px;
-    margin-top:20px;
-  }
-  form{
-    background:var(--bg);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:32px;
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-  }
-  .field label{
-    display:block;
-    font-size:13px;
-    color:var(--text-muted);
-    margin-bottom:8px;
-    font-family:var(--mono);
-  }
-  .field input, .field select, .field textarea{
-    width:100%;
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    color:var(--text);
-    padding:12px 14px;
-    border-radius:6px;
-    font-size:14.5px;
-    font-family:var(--body);
-  }
-  .field input:focus, .field select:focus, .field textarea:focus{
-    outline:none;
-    border-color:var(--gold-dim);
-  }
-  .field textarea{resize:vertical;min-height:80px;}
-  form button{
-    margin-top:6px;
-  }
-  #form-msg{
-    font-size:14px;
-    font-family:var(--mono);
-    display:none;
-    padding:12px 14px;
-    border-radius:6px;
-  }
-  #form-msg.ok{display:block;background:rgba(11,138,107,0.12);color:var(--up);border:1px solid rgba(11,138,107,0.3);}
-  #form-msg.err{display:block;background:rgba(200,72,60,0.12);color:var(--down);border:1px solid rgba(200,72,60,0.3);}
-
-  /* ---------- FOOTER ---------- */
-  footer{
-    padding:48px 0;
-    background:linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
-    border-top:1px solid var(--border);
-    margin-top:0;
-  }
-  .footer-grid{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:20px;
-  }
-  footer .logo{font-size:16px;}
-  footer p{color:var(--text-muted);font-size:13px;}
-  footer a.mail{color:var(--gold);}
-
-  /* ---------- HERO PHOTO ---------- */
-  .hero-photo-frame{
-    border-radius:10px;
-    overflow:hidden;
-  }
-  .hero-photo{
-    position:relative;
-    width:100%;
-    aspect-ratio:2/3;
-    display:flex;
-    align-items:flex-end;
-    justify-content:center;
-    overflow:hidden;
-    background:
-      radial-gradient(circle at 50% 20%, rgba(35,99,158,0.14), transparent 60%),
-      linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
-  }
-  .hero-photo img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:top center;
-    display:block;
-  }
-  .hero-photo-badge{
-    position:absolute;
-    top:14px;
-    left:14px;
-    background:rgba(11,14,20,0.75);
-    border:1px solid var(--border);
-    backdrop-filter:blur(6px);
-    border-radius:6px;
-    padding:6px 10px;
-    font-family:var(--mono);
-    font-size:11px;
-    color:var(--gold);
-    display:flex;
-    align-items:center;
-    gap:6px;
-  }
-  .hero-photo-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--up);display:inline-block;}
-  .mini-chart{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:10px 16px;
-    border-top:1px solid var(--border);
-    font-family:var(--mono);
-    font-size:11px;
-    color:var(--text-muted);
-  }
-
-  /* ---------- STEPS (proceso) ---------- */
-  .steps{
-    display:flex;
-    flex-direction:column;
-    gap:0;
-    border:1px solid var(--border);
-    border-radius:10px;
-    overflow:hidden;
-  }
-  .step-item{
-    display:grid;
-    grid-template-columns:90px 1fr auto;
-    gap:24px;
-    align-items:center;
-    padding:32px 28px;
-    background:var(--bg-panel);
-  }
-  .step-item:not(:last-child){border-bottom:1px solid var(--border);}
-  .step-item:nth-child(even){background:var(--bg-panel-2);}
-  @media(max-width:760px){
-    .step-item{grid-template-columns:1fr;gap:14px;}
-  }
-  .step-num{
-    font-family:var(--mono);
-    font-size:34px;
-    color:var(--gold-dim);
-    line-height:1;
-  }
-  .step-body h3{font-size:19px;margin-bottom:8px;}
-  .step-body p{color:var(--text-muted);font-size:14.5px;max-width:560px;}
-  .step-body .step-meta{
-    display:inline-block;
-    font-family:var(--mono);
-    font-size:11.5px;
-    color:var(--up);
-    margin-top:10px;
-    border:1px solid rgba(11,138,107,0.3);
-    background:rgba(11,138,107,0.08);
-    padding:3px 9px;
-    border-radius:4px;
-  }
-  .step-cta{white-space:nowrap;}
-  @media(max-width:760px){.step-cta{justify-self:start;}}
-
-  /* ---------- TESTIMONIOS ---------- */
-  #testimonios{border-bottom:1px solid var(--border);}
-  .testi-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:20px;
-  }
-  @media(max-width:860px){.testi-grid{grid-template-columns:1fr;}}
-  .testi{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:24px;
-  }
-  .testi .stars{color:var(--gold);font-size:13px;margin-bottom:12px;letter-spacing:2px;}
-  .testi p{font-size:14px;color:var(--text-muted);margin-bottom:16px;}
-  .testi .who{font-family:var(--mono);font-size:12px;color:var(--text);}
-
-  /* ---------- FOOTER SOCIAL / RATING ---------- */
-  .footer-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:20px;
-    padding-bottom:28px;
-    margin-bottom:28px;
-    border-bottom:1px solid var(--border);
-  }
-  .rating-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    font-family:var(--mono);
-    font-size:12.5px;
-    color:var(--text-muted);
-  }
-  .rating-badge b{color:var(--gold);}
-  .social-links{
-    display:flex;
-    gap:10px;
-  }
-  .social-links a{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:40px;
-    height:40px;
-    border:1px solid var(--border);
-    background:#FFFFFF;
-    border-radius:50%;
-    color:var(--gold);
-    transition:background .15s ease, transform .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
-  }
-  .social-links a:hover{
-    background:linear-gradient(145deg, #2C74B4 0%, #1D5488 100%);
-    box-shadow:0 6px 16px rgba(35,99,158,0.3);
-    color:#FFFFFF;
-    border-color:var(--gold);
-    transform:translateY(-3px);
-  }
-  footer .location{font-size:12.5px;color:var(--text-muted);margin-top:6px;}
-
-  ::selection{background:var(--gold);color:#FFFFFF;}
-
-  /* ---------- MODALES DE DETALLE ---------- */
-  .modal-overlay{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(14,22,32,0.45);
-    backdrop-filter:blur(4px);
-    z-index:200;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
-  }
-  .modal-overlay.open{display:flex;}
-  .modal-box{
-    background:var(--bg-panel);
-    border:1px solid var(--gold-dim);
-    border-radius:12px;
-    max-width:600px;
-    width:100%;
-    max-height:85vh;
-    overflow-y:auto;
-    padding:34px;
-    position:relative;
-  }
-  .modal-box.modal-wide{max-width:920px;}
-  .modal-overlay.modal-full{padding:0;}
-  .modal-overlay.modal-full .modal-box{
-    width:100%;
     height:100vh;
-    height:100dvh;
-    max-width:100%;
-    max-height:100vh;
-    max-height:100dvh;
-    border-radius:0;
-    border:none;
-    border-bottom:1px solid var(--gold-dim);
-    padding:64px clamp(20px, 6vw, 100px) 48px;
   }
-  .modal-overlay.modal-full .modal-close{
-    position:fixed;
-    top:calc(env(safe-area-inset-top, 0px) + 14px);
-    right:16px;
-    z-index:999;
+  .brand{
+    text-align:center;
+    padding-bottom:18px;
+    border-bottom:1px solid rgba(255,255,255,0.25);
   }
-  #quiz-fijo{border-bottom:1px solid var(--border);}
-
-  /* ---------- FAQ ---------- */
-  .faq-categories{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:20px;
-    margin-top:28px;
+  .brand-logo{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    object-fit:cover;
+    margin:0 auto 12px;
+    display:block;
+    box-shadow:0 4px 14px rgba(0,0,0,0.18);
+    background:#fff;
   }
-  @media(max-width:900px){.faq-categories{grid-template-columns:1fr;}}
-  .faq-cat{
-    background:var(--bg-panel);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:20px;
-  }
-  .faq-cat h3{
-    font-size:14.5px;
-    margin-bottom:12px;
-    padding-bottom:12px;
-    border-bottom:1px solid var(--border);
-  }
-  .faq-item{
-    border-bottom:1px solid var(--border);
-  }
-  .faq-item:last-child{border-bottom:none;}
-  .faq-item summary{
-    list-style:none;
-    cursor:pointer;
-    padding:12px 22px 12px 0;
-    font-size:13.5px;
-    font-weight:500;
-    color:var(--text);
-    position:relative;
-    line-height:1.4;
-  }
-  .faq-item summary::-webkit-details-marker{display:none;}
-  .faq-item summary::after{
-    content:'+';
-    position:absolute;
-    right:0;
-    top:10px;
-    font-family:var(--mono);
-    color:var(--gold);
-    font-size:16px;
-    transition:transform .15s ease;
-  }
-  .faq-item[open] summary::after{transform:rotate(45deg);}
-  .faq-item summary:hover{color:var(--gold);}
-  .faq-item p{
-    font-size:13px;
-    color:var(--text-muted);
-    line-height:1.6;
-    padding:0 0 16px;
-  }
-  #quiz-fijo .quiz-card{margin-top:32px;max-width:680px;}
-  .modal-close{
-    position:absolute;
-    top:18px;
-    right:18px;
-    background:var(--bg-panel-2);
-    border:1px solid var(--border);
-    color:var(--text-muted);
-    width:34px;
-    height:34px;
-    border-radius:8px;
-    font-size:16px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .modal-close:hover{color:var(--gold);border-color:var(--gold-dim);}
-  .modal-eyebrow{
-    font-family:var(--mono);
-    font-size:11.5px;
-    letter-spacing:0.08em;
-    color:var(--gold);
-    text-transform:uppercase;
-    margin-bottom:10px;
-  }
-  .modal-box h2{
-    font-family:var(--display);
+  .brand h1{
     font-size:23px;
-    margin-bottom:16px;
-    padding-right:30px;
+    margin:0;
+    font-weight:600;
+    letter-spacing:-0.2px;
   }
-  .modal-box p{
-    color:var(--text-muted);
-    font-size:14.5px;
-    line-height:1.65;
-    margin-bottom:16px;
+  .brand .brand-script{
+    font-weight:400;
+    font-size:13px;
+    opacity:0.88;
+    display:block;
+    margin-top:3px;
+    letter-spacing:0.1px;
   }
-  .modal-box h4{
-    font-family:var(--mono);
-    font-size:12.5px;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
-    color:var(--text);
-    margin:22px 0 12px;
-  }
-  .modal-box ul{
+  nav.tabs{
     display:flex;
     flex-direction:column;
-    gap:10px;
-    margin-bottom:16px;
+    gap:6px;
+    flex:1;
   }
-  .modal-box li{
+  nav.tabs button{
+    background:transparent;
+    border:none;
+    color:#fff;
+    text-align:left;
+    padding:12px 14px;
+    border-radius:10px;
     font-size:14.5px;
-    color:var(--text-muted);
-    padding-left:22px;
-    position:relative;
+    font-weight:500;
+    opacity:0.85;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    transition:all .15s ease;
+  }
+  nav.tabs button:hover{opacity:1;background:rgba(255,255,255,0.12);}
+  nav.tabs button.active{
+    opacity:1;
+    background:rgba(255,255,255,0.22);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.3);
+  }
+  .sidebar-footer{
+    font-size:11.5px;
+    opacity:0.75;
+    text-align:center;
     line-height:1.5;
   }
-  .modal-box li::before{
-    content:'—';
-    position:absolute;
-    left:0;
-    color:var(--gold-dim);
-  }
-  .modal-highlight{
-    border:1px dashed var(--gold-dim);
-    border-radius:8px;
-    padding:14px 16px;
-    font-size:14px;
-    color:var(--text-muted);
-    line-height:1.6;
-    margin-bottom:16px;
-    background:rgba(35,99,158,0.06);
-  }
-  .modal-chip{
-    display:inline-block;
-    font-family:var(--mono);
-    font-size:11.5px;
-    color:var(--up);
-    border:1px solid rgba(11,138,107,0.3);
-    background:rgba(11,138,107,0.08);
-    padding:4px 10px;
-    border-radius:4px;
-    margin-bottom:18px;
-  }
-  .modal-plans{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    margin:14px 0 18px;
-  }
-  .modal-plan{
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:14px 8px;
-    text-align:center;
-    font-family:var(--mono);
-    font-size:13px;
-    color:var(--text-muted);
-    position:relative;
-  }
-  .modal-plan.featured{
-    border-color:var(--gold);
-    background:rgba(35,99,158,0.08);
-    color:var(--text);
-  }
-  .modal-plan.featured .tag{
-    position:absolute;
-    top:-11px;
-    left:50%;
-    transform:translateX(-50%);
-    background:var(--gold);
-    color:#FFFFFF;
-    font-size:9.5px;
-    font-weight:700;
-    letter-spacing:0.04em;
-    padding:2px 8px;
-    border-radius:4px;
-    white-space:nowrap;
-  }
-  .modal-box .btn{width:100%;justify-content:center;margin-top:6px;}
 
-  .modal-tabs{
+  main{
+    padding:32px 40px 60px;
+    max-width:1200px;
+    width:100%;
+  }
+  .view{display:none;}
+  .view.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .page-header{
     display:flex;
-    gap:8px;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:24px;
+  }
+  .page-header h2{font-size:26px;margin:0 0 4px;}
+  .page-header p{margin:0;color:var(--gray);font-size:13.5px;}
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:var(--white);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+    padding:22px;
+    border:1px solid var(--line);
+  }
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:16px;
     margin-bottom:22px;
-    border-bottom:1px solid var(--border);
   }
-  .modal-tab{
-    flex:1;
-    background:none;
-    border:none;
-    border-bottom:2px solid transparent;
-    color:var(--text-muted);
-    font-family:var(--mono);
-    font-size:12.5px;
-    font-weight:600;
-    padding:10px 6px 12px;
-    cursor:pointer;
-    text-align:center;
-    -webkit-appearance:none;
-    appearance:none;
+  .stat-card{
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    box-shadow:var(--shadow-sm);
+    border:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
   }
-  .modal-tab-sub{
+  .stat-card::before{
+    content:'';
+    position:absolute;top:0;left:0;height:100%;width:4px;
+    background:var(--teal);
+  }
+  .stat-card.expense::before{background:var(--danger);}
+  .stat-card .label{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:0.6px;}
+  .stat-card .value{font-size:25px;font-weight:600;margin-top:6px;color:var(--ink);}
+  .stat-card.expense .value{color:var(--danger);}
+  .stat-card.profit .value{color:var(--teal-dark);}
+
+  .period-toggle{
+    display:inline-flex;
+    background:var(--white);
+    border-radius:10px;
+    padding:4px;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-sm);
+  }
+  .period-toggle button{
+    border:none;background:transparent;padding:8px 16px;border-radius:8px;
+    font-size:13px;font-weight:500;color:var(--gray);
+  }
+  .period-toggle button.active{background:var(--teal);color:#fff;}
+
+  .chart-grid{
+    display:grid;
+    grid-template-columns:1.5fr 1fr 1fr;
+    gap:18px;
+    margin-top:20px;
+  }
+  .chart-card h3{font-size:15px;margin:0 0 14px;color:var(--ink);}
+  .chart-card{min-height:280px;}
+
+  @media(max-width:980px){
+    .chart-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- FORMS ---------- */
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:14px;
+  }
+  label{
+    font-size:12px;
+    color:var(--gray);
+    font-weight:500;
     display:block;
-    font-family:var(--body);
-    font-weight:400;
-    font-size:11px;
-    color:var(--text-muted);
-    margin-top:3px;
+    margin-bottom:5px;
   }
-  .modal-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
-  .modal-tab.active .modal-tab-sub{color:var(--gold-dim);}
+  input,select,textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:14px;
+    color:var(--ink);
+    background:#fbfffe;
+    outline:none;
+    transition:border .15s;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--teal);}
+  .btn{
+    border:none;
+    padding:11px 22px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:600;
+    color:#fff;
+    background:var(--teal);
+    box-shadow:0 4px 12px rgba(34,168,147,0.28);
+  }
+  .btn:hover{background:var(--teal-dark);}
+  .btn.danger{background:var(--danger);box-shadow:0 4px 12px rgba(192,85,77,0.25);}
+  .btn.danger:hover{background:#a8443d;}
+  .btn.ghost{
+    background:transparent;color:var(--teal-dark);
+    border:1px solid var(--teal-light);box-shadow:none;
+  }
+  .btn.ghost:hover{background:var(--teal-light);}
+  .btn.small{padding:6px 12px;font-size:12.5px;border-radius:8px;}
+  .btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+
+  .tab-switch{display:flex;gap:8px;margin-bottom:18px;}
+  .tab-switch button{
+    padding:9px 18px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;font-size:13.5px;font-weight:500;color:var(--gray);
+  }
+  .tab-switch button.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .tab-switch button.expense-tab.active{background:var(--danger);border-color:var(--danger);}
+
+  /* ---------- TABLE ---------- */
+  table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);}
+  th{color:var(--gray);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:0.4px;}
+  tr:hover td{background:#f7fffd;}
+  .pill{
+    display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;
+  }
+  .pill.cejas{background:#e6f7f2;color:var(--teal-dark);}
+  .pill.estilista{background:#fdeee0;color:#b5651d;}
+  .pill.manicurista{background:#f3e8fb;color:#7b3fb0;}
+  .pill.efectivo{background:#eef6e8;color:#5a8a2c;}
+  .pill.yappy{background:#e3edfc;color:#2f5fad;}
+  .row-actions button{
+    background:none;border:none;font-size:14px;padding:4px 6px;color:var(--gray-light);
+  }
+  .row-actions button:hover{color:var(--teal-dark);}
+  .row-actions button.del:hover{color:var(--danger);}
+  .empty-msg{text-align:center;color:var(--gray-light);padding:30px 10px;font-size:13.5px;}
+
+  /* ---------- SERVICES ---------- */
+  .service-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;}
+  .service-col h3{
+    display:flex;align-items:center;gap:8px;font-size:16px;margin:0 0 14px;
+  }
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .dot.cejas{background:var(--teal);}
+  .dot.estilista{background:#e08a3c;}
+  .dot.manicurista{background:#a463d1;}
+  .service-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 4px;border-bottom:1px solid var(--line);font-size:13.5px;
+  }
+  .service-item .sname{font-weight:500;}
+  .service-item .sprice{color:var(--teal-dark);font-weight:600;margin-left:auto;margin-right:10px;}
+  .add-service-form{display:flex;gap:8px;margin-top:14px;}
+  .add-service-form input{flex:1;}
+
+  /* ---------- CALENDAR ---------- */
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .cal-header h3{margin:0;font-size:18px;}
+  .cal-nav button{background:var(--white);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:14px;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+  .cal-dow{text-align:center;font-size:11.5px;color:var(--gray);font-weight:600;text-transform:uppercase;padding-bottom:6px;}
+  .cal-day{
+    background:#fff;border:1px solid var(--line);border-radius:10px;min-height:80px;
+    padding:8px;font-size:12.5px;position:relative;cursor:pointer;transition:box-shadow .15s;
+  }
+  .cal-day:hover{box-shadow:var(--shadow-sm);}
+  .cal-day.muted{opacity:0.35;}
+  .cal-day.today{border-color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--teal);}
+  .cal-day .dnum{font-weight:600;}
+  .cal-day .apt-count{
+    margin-top:6px;background:var(--teal);color:#fff;border-radius:20px;
+    font-size:10.5px;padding:2px 8px;display:inline-block;
+  }
+  .week-list{display:flex;flex-direction:column;gap:10px;}
+  .week-day-block{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .week-day-block h4{margin:0 0 8px;font-size:14px;}
+  .apt-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px dashed var(--line);font-size:13px;}
+  .apt-row:first-of-type{border-top:none;}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(15,30,28,0.45);
+    align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal-box{
+    background:#fff;border-radius:var(--radius);padding:26px;max-width:520px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);max-height:88vh;overflow:auto;
+  }
+  .modal-box h3{margin:0 0 16px;font-size:18px;}
+  .modal-close{float:right;background:none;border:none;font-size:20px;color:var(--gray);}
+
+  .view-toggle-cal{display:flex;gap:8px;}
+
+  .badge-locked{background:#f3f3f3;color:var(--gray);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+
+  .cierre-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0;}
+  .cierre-summary .item{background:#fbfffe;border:1px solid var(--line);border-radius:12px;padding:14px;}
+  .cierre-summary .item .k{font-size:11.5px;color:var(--gray);text-transform:uppercase;letter-spacing:0.4px;}
+  .cierre-summary .item .v{font-size:19px;font-weight:600;margin-top:4px;}
+
+  .toast{
+    position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;
+    padding:12px 20px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow);
+    opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;z-index:200;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  @media(max-width:860px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{position:relative;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;}
+    nav.tabs{flex-direction:row;flex-wrap:wrap;}
+    main{padding:20px;}
+  }
+
+  @media print{
+    .sidebar,.page-header .btn,.no-print{display:none !important;}
+    main{padding:0;}
+    body{background:#fff;}
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <nav>
-    <div class="logo-lockup">
-      <img src="images/logo.png" alt="MentoryCap" class="logo-img">
-      <span class="logo-text">MENTORY<span>CAP</span></span>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <img class="brand-logo" id="brandLogo" src="logo.png" alt="Cejas Lovely" onerror="this.replaceWith(fallbackLogoSVG())">
+      <h1>Cejas Lovely</h1>
+      <span class="brand-script">Panel Administrativo</span>
     </div>
-    <ul class="nav-links nav-mobile-hide">
-      <li><button type="button" class="nav-link-btn" onclick="openModal('modal-mercado')">Mercado</button></li>
-      <li><button type="button" class="nav-link-btn" onclick="openModal('modal-historia')">Historia</button></li>
-      <li><a href="#servicios">Servicios</a></li>
-      <li><a href="#youtube-cta">YouTube</a></li>
-      <li><button type="button" class="nav-link-btn" onclick="openModal('modal-enlaces')">Recursos</button></li>
-      <li><button type="button" class="nav-link-btn" onclick="openChat()">Contacto</button></li>
-    </ul>
-  </nav>
-</header>
+    <nav class="tabs">
+      <button class="tab-btn active" data-view="dashboard">📊 &nbsp;Dashboard</button>
+      <button class="tab-btn" data-view="movimientos">💰 &nbsp;Ingresos y Gastos</button>
+      <button class="tab-btn" data-view="servicios">✂️ &nbsp;Servicios</button>
+      <button class="tab-btn" data-view="calendario">📅 &nbsp;Calendario</button>
+      <button class="tab-btn" data-view="caja">🗂️ &nbsp;Cierre de Caja</button>
+    </nav>
+    <div class="sidebar-footer">Cejas Lovely · Máster en Cejas<br>Datos guardados en este navegador</div>
+  </aside>
 
-<section class="hero hero-bg">
-  <img src="images/oscar-desk.png" alt="Oscar Rojas, fundador de MentoryCap" class="hero-bg-photo">
-  <div class="hero-overlay"></div>
-  <div class="container hero-content">
-    <h1>Empieza a construir una Economía Alternativa</h1>
-    <p class="hero-subtitle">Dale mayor utilidad a tus ingresos.</p>
-    <div class="hero-motto">
-      <span>Aprende</span><i>•</i><span>Invierte</span><i>•</i><span>Crece</span>
-    </div>
-  </div>
-</section>
+  <main>
 
-
-<section id="historia-cta">
-  <div class="container">
-    <div class="historia-cta-box">
-      <h2>Los errores son el costo de aprender algo valioso.</h2>
-      <p>Soy Oscar. Mi objetivo es ayudarte a entender mejor la economía global y tus finanzas personales, para que tomes decisiones con más criterio y confianza.</p>
-      <button type="button" class="btn btn-primary" onclick="openModal('modal-historia')">Conoce mi historia</button>
-    </div>
-  </div>
-</section>
-
-<div class="modal-overlay modal-full" id="modal-mercado" onclick="if(event.target===this) closeModal('modal-mercado')">
-  <div class="modal-box modal-wide">
-    <button class="modal-close" onclick="closeModal('modal-mercado')" aria-label="Cerrar">✕</button>
-    <div class="section-head">
-      <div class="eyebrow">EL MERCADO HOY</div>
-      <h2 style="font-size:20px;">Un vistazo rápido, pensado para cualquiera</h2>
-      <p>No hace falta que seas trader para entender esto. Abajo tienes la hora y qué bolsas del mundo están abiertas ahora mismo, cómo se están moviendo los precios, y las criptomonedas más importantes — todo explicado.</p>
-    </div>
-
-    <div class="market-clock-box">
-      <div class="market-clock-top">
-        <span class="clock-time" id="clock-time">--:--:--</span>
-        <span class="clock-label">Hora de Nueva York</span>
-      </div>
-      <div class="market-strip-sessions" id="sessions-list"></div>
-      <p class="tool-desc" style="margin-top:12px;">En MentoryCap nos enfocamos en el mercado Forex (divisas), que opera 24 horas — pero estos horarios de bolsa igual te sirven: cuando una de estas bolsas está "abierta", también aumenta el volumen de transacciones y la volatilidad en la moneda de ese país. Por ejemplo, cuando Londres o Nueva York abren, el EUR/USD suele moverse con más fuerza. El punto verde te dice cuál está activa ahora mismo, y a qué hora abre y cierra cada una (en hora de Nueva York, para comparar fácil).</p>
-      <p class="tool-desc" style="margin-top:8px;">Fíjate también en las horas donde <strong style="color:var(--text);">dos bolsas coinciden abiertas</strong> (por ejemplo Londres y Nueva York) — ahí suele concentrarse la mayor actividad del día en el mercado de divisas.</p>
-    </div>
-
-    <div class="section-head" style="margin-top:36px;">
-      <h2 style="font-size:18px;">Gráficas en vivo</h2>
-      <p style="font-size:13px;">Cada tarjeta muestra un precio y su cambio reciente: <span class="up" style="font-weight:600;">verde</span> si subió, <span class="down" style="font-weight:600;">rojo</span> si bajó. Usa los botones de arriba para ver el día, la semana, el mes o el histórico completo.</p>
-    </div>
-    <div class="stocks-range" id="stocks-range">
-      <button class="stocks-range-btn active" type="button" onclick="setStocksRange('dia', this)">Día</button>
-      <button class="stocks-range-btn" type="button" onclick="setStocksRange('semana', this)">Semana</button>
-      <button class="stocks-range-btn" type="button" onclick="setStocksRange('mes', this)">Mes</button>
-      <button class="stocks-range-btn" type="button" onclick="setStocksRange('todo', this)">Todo</button>
-    </div>
-    <div class="stocks-grid" id="stocks-grid">
-      <div class="stock-card" id="stock-btc">
-        <div class="stock-top">
-          <div>
-            <div class="stock-symbol">BTC/USD</div>
-            <div class="stock-name">Bitcoin</div>
-          </div>
-          <div class="stock-price-wrap">
-            <div class="stock-price" id="stock-btc-price">…</div>
-            <div class="stock-change" id="stock-btc-change">—</div>
-          </div>
+    <!-- ================= DASHBOARD ================= -->
+    <section class="view active" id="view-dashboard">
+      <div class="page-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Resumen del rendimiento del salón</p>
         </div>
-        <svg class="stock-chart" id="stock-btc-chart" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
-      </div>
-      <div class="stock-card" id="stock-xau">
-        <div class="stock-top">
-          <div>
-            <div class="stock-symbol">XAU/USD</div>
-            <div class="stock-name">Oro</div>
-          </div>
-          <div class="stock-price-wrap">
-            <div class="stock-price" id="stock-xau-price">…</div>
-            <div class="stock-change" id="stock-xau-change">—</div>
-          </div>
-        </div>
-        <svg class="stock-chart" id="stock-xau-chart" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
-      </div>
-      <div class="stock-card" id="stock-eurusd">
-        <div class="stock-top">
-          <div>
-            <div class="stock-symbol">EUR/USD</div>
-            <div class="stock-name">Euro / Dólar</div>
-          </div>
-          <div class="stock-price-wrap">
-            <div class="stock-price" id="stock-eurusd-price">…</div>
-            <div class="stock-change" id="stock-eurusd-change">—</div>
-          </div>
-        </div>
-        <svg class="stock-chart" id="stock-eurusd-chart" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
-      </div>
-      <div class="stock-card" id="stock-dxy">
-        <div class="stock-top">
-          <div>
-            <div class="stock-symbol">DXY</div>
-            <div class="stock-name">Dólar Index</div>
-          </div>
-          <div class="stock-price-wrap">
-            <div class="stock-price" id="stock-dxy-price">…</div>
-            <div class="stock-change" id="stock-dxy-change">—</div>
-          </div>
-        </div>
-        <svg class="stock-chart" id="stock-dxy-chart" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
-      </div>
-    </div>
-    <p class="calc-note" style="margin-top:14px;">Bitcoin y Oro en vivo (Binance). EUR/USD y DXY con tasa de referencia diaria (BCE) — se actualizan una vez al día.</p>
-
-    <div class="top20-card" style="margin-top:32px;">
-      <h3>🏆 Top 10 criptomonedas</h3>
-      <p class="tool-desc">Las 10 criptomonedas más importantes del momento, con su precio y cuánto subieron o bajaron en las últimas 24 horas. <strong style="color:var(--text);">Toca cualquiera para ver su gráfica</strong> — no te quedes solo con el precio, mira cómo se ha comportado.</p>
-      <div id="top10-list" class="top20-list">
-        <p class="calc-note">Cargando datos...</p>
-      </div>
-
-      <div class="stock-card crypto-detail-card" id="crypto-detail-card" style="display:none;">
-        <button class="crypto-detail-close" onclick="hideCryptoDetail()" aria-label="Cerrar">✕</button>
-        <div class="stock-top">
-          <div>
-            <div class="stock-symbol" id="crypto-detail-symbol">—</div>
-            <div class="stock-name" id="crypto-detail-name">—</div>
-          </div>
-          <div class="stock-price-wrap">
-            <div class="stock-price" id="crypto-detail-price">…</div>
-            <div class="stock-change" id="crypto-detail-change">—</div>
-          </div>
-        </div>
-        <svg class="stock-chart" id="crypto-detail-chart" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
-        <div class="stocks-range" id="crypto-detail-range" style="margin-top:14px;">
-          <button class="stocks-range-btn active" type="button" onclick="setCryptoDetailRange('dia', this)">Día</button>
-          <button class="stocks-range-btn" type="button" onclick="setCryptoDetailRange('semana', this)">Semana</button>
-          <button class="stocks-range-btn" type="button" onclick="setCryptoDetailRange('mes', this)">Mes</button>
-          <button class="stocks-range-btn" type="button" onclick="setCryptoDetailRange('todo', this)">Todo</button>
+        <div class="period-toggle" id="dashPeriodToggle">
+          <button data-period="day" class="active">Hoy</button>
+          <button data-period="week">Esta semana</button>
+          <button data-period="month">Este mes</button>
         </div>
       </div>
-    </div>
-  </div>
+
+      <div class="stat-grid" id="dashStats"></div>
+
+      <div class="chart-grid">
+        <div class="card chart-card">
+          <h3>Tendencia de ingresos y gastos</h3>
+          <canvas id="chartTrend" height="220"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3>Ingresos por categoría</h3>
+          <canvas id="chartCategory" height="220"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3>Método de pago</h3>
+          <canvas id="chartPayment" height="220"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MOVIMIENTOS ================= -->
+    <section class="view" id="view-movimientos">
+      <div class="page-header">
+        <div>
+          <h2>Ingresos y Gastos</h2>
+          <p>Registra las transacciones diarias del salón</p>
+        </div>
+      </div>
+
+      <div class="tab-switch">
+        <button class="mv-tab active" data-mv="ingreso">＋ Registrar Ingreso</button>
+        <button class="mv-tab expense-tab" data-mv="gasto">－ Registrar Gasto</button>
+      </div>
+
+      <div class="card" id="mv-form-card">
+        <!-- Ingreso Form -->
+        <form id="formIngreso" class="mv-form">
+          <input type="hidden" id="ing-editId">
+          <div class="form-grid">
+            <div>
+              <label>Fecha</label>
+              <input type="date" id="ing-fecha" required>
+            </div>
+            <div>
+              <label>Categoría</label>
+              <select id="ing-categoria" required>
+                <option value="cejas">Cejas</option>
+                <option value="estilista">Estilista</option>
+                <option value="manicurista">Manicurista</option>
+              </select>
+            </div>
+            <div>
+              <label>Servicio</label>
+              <select id="ing-servicio" required></select>
+            </div>
+            <div>
+              <label>Cliente</label>
+              <input type="text" id="ing-cliente" placeholder="Nombre del cliente (opcional)">
+            </div>
+            <div>
+              <label>Precio (US$)</label>
+              <input type="number" step="0.01" min="0" id="ing-precio" required>
+            </div>
+            <div>
+              <label>Método de pago</label>
+              <select id="ing-pago" required>
+                <option value="efectivo">Efectivo</option>
+                <option value="yappy">Yappy</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <label>Notas (opcional)</label>
+            <input type="text" id="ing-notas" placeholder="Notas adicionales">
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn">Guardar Ingreso</button>
+            <button type="button" class="btn ghost" id="ing-cancel" style="display:none;">Cancelar edición</button>
+          </div>
+        </form>
+
+        <!-- Gasto Form -->
+        <form id="formGasto" class="mv-form" style="display:none;">
+          <input type="hidden" id="gas-editId">
+          <div class="form-grid">
+            <div>
+              <label>Fecha</label>
+              <input type="date" id="gas-fecha" required>
+            </div>
+            <div>
+              <label>Categoría</label>
+              <select id="gas-categoria" required>
+                <option value="Insumos">Insumos</option>
+                <option value="Renta">Renta</option>
+                <option value="Servicios públicos">Servicios públicos</option>
+                <option value="Salarios">Salarios</option>
+                <option value="Publicidad">Publicidad</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div>
+              <label>Descripción</label>
+              <input type="text" id="gas-desc" placeholder="Ej. Compra de cera" required>
+            </div>
+            <div>
+              <label>Monto (US$)</label>
+              <input type="number" step="0.01" min="0" id="gas-monto" required>
+            </div>
+            <div>
+              <label>Método de pago</label>
+              <select id="gas-pago" required>
+                <option value="efectivo">Efectivo</option>
+                <option value="yappy">Yappy</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn danger">Guardar Gasto</button>
+            <button type="button" class="btn ghost" id="gas-cancel" style="display:none;">Cancelar edición</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <div class="page-header" style="margin-bottom:6px;">
+          <h3 style="margin:0;font-size:16px;">Movimientos recientes</h3>
+          <div class="form-grid" style="grid-template-columns:auto auto;gap:8px;">
+            <div>
+              <input type="date" id="filterDesde">
+            </div>
+            <div>
+              <input type="date" id="filterHasta">
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Tipo</th><th>Detalle</th><th>Cliente</th><th>Pago</th><th>Monto</th><th></th></tr>
+          </thead>
+          <tbody id="movTableBody"></tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SERVICIOS ================= -->
+    <section class="view" id="view-servicios">
+      <div class="page-header">
+        <div>
+          <h2>Servicios</h2>
+          <p>Administra las categorías, subservicios y precios</p>
+        </div>
+      </div>
+      <div class="service-columns" id="serviceColumns"></div>
+    </section>
+
+    <!-- ================= CALENDARIO ================= -->
+    <section class="view" id="view-calendario">
+      <div class="page-header">
+        <div>
+          <h2>Calendario de Citas</h2>
+          <p>Agenda diaria y semanal confirmada por clientes</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="period-toggle" id="calViewToggle">
+            <button data-calview="month" class="active">Mes</button>
+            <button data-calview="week">Semana</button>
+          </div>
+          <button class="btn" id="btnNuevaCita">＋ Nueva Cita</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="calMonthView">
+          <div class="cal-header">
+            <div class="cal-nav"><button id="calPrev">‹</button></div>
+            <h3 id="calMonthLabel"></h3>
+            <div class="cal-nav"><button id="calNext">›</button></div>
+          </div>
+          <div class="cal-grid" id="calDowRow"></div>
+          <div class="cal-grid" id="calGrid" style="margin-top:8px;"></div>
+        </div>
+        <div id="calWeekView" style="display:none;">
+          <div class="cal-header">
+            <div class="cal-nav"><button id="calWeekPrev">‹</button></div>
+            <h3 id="calWeekLabel"></h3>
+            <div class="cal-nav"><button id="calWeekNext">›</button></div>
+          </div>
+          <div class="week-list" id="weekList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CIERRE DE CAJA ================= -->
+    <section class="view" id="view-caja">
+      <div class="page-header">
+        <div>
+          <h2>Cierre de Caja</h2>
+          <p>Cierra y consulta el registro diario de caja</p>
+        </div>
+        <div>
+          <label style="margin-bottom:2px;">Fecha</label>
+          <input type="date" id="cajaFecha">
+        </div>
+      </div>
+
+      <div class="card" id="cajaResumenCard"></div>
+
+      <div class="page-header" style="margin-top:26px;margin-bottom:10px;">
+        <div>
+          <h3 style="margin:0;font-size:17px;">Cierre por área</h3>
+          <p style="margin:2px 0 0;">Calcula ingresos, comisión y pago a la trabajadora de cada área</p>
+        </div>
+      </div>
+      <div class="service-columns" id="cajaAreaCards"></div>
+
+      <div class="card" style="margin-top:22px;">
+        <h3 style="margin:0 0 6px;font-size:16px;">Historial de cierres</h3>
+        <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Área</th><th>Ingresos</th><th>Clientes</th><th>% Comisión</th><th>Pago trabajadora</th><th>Neto salón</th><th>Cerrado</th><th></th></tr>
+          </thead>
+          <tbody id="cierreHistBody"></tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
 </div>
 
-
-<div class="modal-overlay modal-full" id="modal-enlaces" onclick="if(event.target===this) closeModal('modal-enlaces')">
-  <div class="modal-box modal-wide">
-    <button class="modal-close" onclick="closeModal('modal-enlaces')" aria-label="Cerrar">✕</button>
-    <div class="section-head">
-      <div class="eyebrow">MIS HERRAMIENTAS</div>
-      <h2>Enlaces que uso todos los días</h2>
-      <p>Las plataformas con las que trabajo.</p>
-    </div>
-
-    <div class="section-head" style="margin-top:40px;">
-      <div class="eyebrow">ENLACES</div>
-      <h2 style="font-size:20px;">Lo que uso todos los días</h2>
-    </div>
-    <div class="links-groups">
-      <div class="links-group">
-        <div class="links-group-label">Análisis y datos</div>
-        <a class="link-row" href="https://es.tradingview.com/pricing/?share_your_love=orojas0180" target="_blank" rel="noopener">
-          <span class="link-row-text"><span class="link-row-name">TradingView</span><span class="link-row-desc">Gráficos y análisis técnico</span></span>
-          <span class="link-row-arrow">→</span>
-        </a>
-        <a class="link-row" href="https://www.geckoterminal.com/es" target="_blank" rel="noopener">
-          <span class="link-row-text"><span class="link-row-name">CoinGecko</span><span class="link-row-desc">Precios y datos de cripto</span></span>
-          <span class="link-row-arrow">→</span>
-        </a>
-        <a class="link-row" href="https://www.forexfactory.com/" target="_blank" rel="noopener">
-          <span class="link-row-text"><span class="link-row-name">Forex Factory</span><span class="link-row-desc">Noticias del mercado</span></span>
-          <span class="link-row-arrow">→</span>
-        </a>
-      </div>
-
-      <div class="links-group">
-        <div class="links-group-label">Brókers</div>
-        <a class="link-row" href="https://www.litefinance.org/?uid=787594077" target="_blank" rel="noopener">
-          <span class="link-row-text"><span class="link-row-name">LiteFinance</span><span class="link-row-desc">Mi bróker principal</span></span>
-          <span class="link-row-arrow">→</span>
-        </a>
-        <a class="link-row" href="https://vigco.co/la-com/qGBBx3Cz" target="_blank" rel="noopener">
-          <span class="link-row-text"><span class="link-row-name">Vantage</span><span class="link-row-desc">Otro bróker que utilizo</span></span>
-          <span class="link-row-arrow">→</span>
-        </a>
-      </div>
-
-      <div class="links-group">
-        <div class="links-group-label">Cripto</div>
-        <a class="link-row" href="https://www.gate.com/es/referral/registry?ref=BFREUFhc&ref_type=103&page=superRebate" target="_blank" rel="noopener">
-          <span class="link-row-text"><span class="link-row-name">Gate.io</span><span class="link-row-desc">Mi exchange de cripto</span></span>
-          <span class="link-row-arrow">→</span>
-        </a>
-        <a class="link-row" href="https://lulubit.onelink.me/IwPm/wpp" target="_blank" rel="noopener">
-          <span class="link-row-text"><span class="link-row-name">Lulubit</span><span class="link-row-desc">Wallet de criptomonedas</span></span>
-          <span class="link-row-arrow">→</span>
-        </a>
-        <a class="link-row" href="https://www.ether.fi/refer/af522754" target="_blank" rel="noopener">
-          <span class="link-row-text"><span class="link-row-name">ether.fi</span><span class="link-row-desc">Mi tarjeta cripto</span></span>
-          <span class="link-row-arrow">→</span>
-        </a>
-      </div>
-    </div>
-  </div>
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox"></div>
 </div>
 
-<div class="modal-overlay modal-full" id="modal-historia" onclick="if(event.target===this) closeModal('modal-historia')">
-  <div class="modal-box modal-wide">
-    <button class="modal-close" onclick="closeModal('modal-historia')" aria-label="Cerrar">✕</button>
-    <div class="section-head">
-      <div class="eyebrow">MI HISTORIA</div>
-      <h2>No ha sido un camino perfecto. Sigue siendo un camino de construcción.</h2>
-    </div>
-
-    <p class="story-lead">Llegué porque <span>nunca dejé de construir</span>.</p>
-
-    <div class="timeline">
-      <div class="t-item">
-        <span class="t-date">Los inicios</span>
-        <h3>Un ingeniero con otros sueños</h3>
-        <p>Desde joven quise una vida diferente. Soy ingeniero en Telecomunicaciones, pero mi verdadero interés siempre fue emprender y seguir aprendiendo. No fue un camino fácil: negocios que no funcionaron, errores, y más de un "empezar de nuevo".</p>
-      </div>
-      <div class="t-item">
-        <span class="t-date">Mi camino por Europa</span>
-        <h3>Lo que aprendí viendo cómo vivían otros</h3>
-        <p>He vivido en Europa y visitado muchos países, lo que me dio una mirada mucho más amplia sobre cómo funciona la economía, las personas y el mundo en general. Ver de cerca tantas formas distintas de vivir, trabajar y pensar el dinero me enseñó que la perspectiva con la que miras algo cambia por completo lo que eres capaz de ver en ello. Esa visión global es, hoy, una de las cosas que más valoro de mi camino: muchas veces, donde otros solo ven riesgo, yo he aprendido a buscar primero qué oportunidad puede haber detrás.</p>
-      </div>
-    </div>
-
-    <div class="story-highlight beliefs">
-      <span class="tag">En lo que creo</span>
-      <p>No creo en los atajos ni en las promesas de dinero fácil. Creo en la educación, en desarrollar criterio propio y en construir una relación sana con el dinero.</p>
-    </div>
-
-    <p class="story-closing">Con el tiempo entendí que el progreso real no viene de un golpe de suerte, sino de tomar buenas decisiones de forma constante durante mucho tiempo. Esa es la filosofía detrás de todo lo que hago hoy: <span>acompañar a otras personas a entender mejor la economía y sus finanzas personales</span>, con paciencia y criterio propio.</p>
-  </div>
-</div>
-
-<section id="servicios">
-  <div class="container" style="text-align:center;">
-    <div class="section-head" style="margin-left:auto;margin-right:auto;">
-      <div class="eyebrow">APRENDE CONMIGO</div>
-      <h2>Economía global, explicada de forma simple</h2>
-      <p>Aprende sobre economía digital, mercados financieros y herramientas para gestionar mejor tu dinero de forma online, construir tus propias fuentes de ingreso y patrimonio.</p>
-    </div>
-  </div>
-</section>
-
-<section id="youtube-cta">
-  <div class="container">
-    <div class="section-head" style="text-align:center;margin-left:auto;margin-right:auto;">
-      <div class="eyebrow">TRES OPCIONES</div>
-      <h2>¿Por dónde quieres empezar?</h2>
-      <p style="max-width:560px;margin-left:auto;margin-right:auto;">Mi objetivo es ayudarte a construir un patrimonio de forma inteligente. Elige el camino que mejor se adapte a ti.</p>
-    </div>
-
-    <div class="options-stack">
-      <details class="option-item">
-        <summary>
-          <span class="option-num">1</span>
-          <span class="option-summary-text">
-            <strong>Aprende por tu cuenta</strong>
-            <span class="option-tagline">Accede a contenido gratuito para aprender sobre los mercados financieros.</span>
-          </span>
-          <span class="option-chevron">▾</span>
-        </summary>
-        <div class="option-body">
-          <p>Si quieres aprender a operar los mercados por tu cuenta, empieza por aquí: tengo contenido gratuito en mi YouTube para que te inicies en este mundo, sin costo y sin registro.</p>
-          <div class="youtube-embed-wrap">
-            <iframe src="https://www.youtube.com/embed/videoseries?list=PLuJnrEPKGTVNtsjMhUeTVyw4r1icLWTZ6" title="Playlist de MentoryCap en YouTube" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-          </div>
-          <div class="youtube-embed-wrap" style="margin-top:16px;">
-            <iframe src="https://www.youtube.com/embed/Ol4p5roljw4" title="Video de MentoryCap en YouTube" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-          </div>
-          <div style="text-align:center;margin-top:20px;">
-            <a href="https://youtube.com/playlist?list=PLuJnrEPKGTVNtsjMhUeTVyw4r1icLWTZ6&si=_PKqaznTga0oL201" target="_blank" rel="noopener" class="btn youtube-btn">▶ Ver la playlist completa en YouTube</a>
-          </div>
-        </div>
-      </details>
-
-      <details class="option-item">
-        <summary>
-          <span class="option-num">2</span>
-          <span class="option-summary-text">
-            <strong>Aprende 1 a 1 conmigo</strong>
-            <span class="option-tagline">Formación y acompañamiento privado para que operes los mercados con criterio y una estrategia definida.</span>
-          </span>
-          <span class="option-chevron">▾</span>
-        </summary>
-        <div class="option-body">
-          <p>Un acompañamiento personalizado, paso a paso, donde aprendes directamente de mi experiencia: cómo leo y analizo el mercado en vivo, qué herramientas uso día a día, y construimos juntos la estrategia que mejor se adapta a tu perfil.</p>
-          <div class="modal-highlight">
-            <strong style="color:var(--gold);">Atención exclusiva por WhatsApp</strong>
-            <p style="margin:10px 0 0;color:var(--text-muted);font-size:14px;">Nos reunimos de forma presencial o por videollamada, según lo que mejor te funcione. No eres un número más en un grupo — trabajamos tu caso directamente.</p>
-          </div>
-          <h4>Qué incluye</h4>
-          <ul>
-            <li>Sesiones 1 a 1, presenciales o por videollamada.</li>
-            <li>Análisis del mercado en vivo, aprendiendo mi forma de leerlo.</li>
-            <li>Acceso a las herramientas que uso día a día.</li>
-            <li>Construimos juntos tu estrategia y le damos seguimiento mes a mes.</li>
-            <li>Acceso a todo el contenido de mis cursos y mentorías grabadas.</li>
-          </ul>
-          <button class="btn btn-primary js-contacto" data-servicio="Mentorycap 1 a 1" style="width:100%;justify-content:center;margin-top:16px;" type="button">Quiero más información</button>
-        </div>
-      </details>
-
-      <details class="option-item">
-        <summary>
-          <span class="option-num">3</span>
-          <span class="option-summary-text">
-            <strong>Seamos socios</strong>
-            <span class="option-tagline">Trabajemos juntos para construir y escalar tu patrimonio a largo plazo.</span>
-          </span>
-          <span class="option-chevron">▾</span>
-        </summary>
-        <div class="option-body">
-          <div class="modal-eyebrow" style="margin-bottom:12px;">Mentorycap Partners</div>
-          <p>Un programa en el que te ayudo a gestionar tu capital, con seguimiento personalizado y acompañamiento constante — para quienes prefieren no operar los mercados por sí mismos.</p>
-          <div class="modal-highlight">
-            <strong style="color:var(--gold);">Un espacio exclusivo</strong>
-            <p style="margin:10px 0 0;color:var(--text-muted);font-size:14px;">No es un servicio abierto a todo público: los cupos son muy limitados y no todos pueden aplicar. Nació como un programa confidencial pensado para familiares y amistades muy cercanas, y hoy abro un espacio reducido para quienes califican. El proceso incluye una reunión directa conmigo para conocer tu caso.</p>
-          </div>
-          <h4>Ideal para personas que</h4>
-          <ul>
-            <li>Disponen de capital, pero no cuentan con el tiempo o la experiencia necesaria para operar los mercados.</li>
-            <li>Buscan un enfoque orientado a la preservación del capital, la consistencia y el crecimiento sostenible a largo plazo.</li>
-          </ul>
-          <h4>Nuestro compromiso</h4>
-          <ul>
-            <li>Gestión basada en criterios objetivos y disciplina operativa.</li>
-            <li>Control de riesgo adaptado a las condiciones del mercado.</li>
-            <li>Comunicación transparente y acceso a información real sobre el desempeño.</li>
-          </ul>
-          <button class="btn btn-primary js-contacto" data-servicio="Mentorycap Partners" style="width:100%;justify-content:center;margin-top:16px;" type="button">Quiero más información</button>
-        </div>
-      </details>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="container">
-    <div class="footer-top">
-      <div class="rating-badge"><b>★ 5.0</b> calificación</div>
-      <div class="social-links">
-        <a href="https://www.instagram.com/oscar.rojasc?igsh=eDVhMzF2Y29kcHF2&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5.5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor"/></svg>
-        </a>
-        <a href="https://www.tiktok.com/@oscar.rojasc?_r=1&_t=ZS-97wrnSoMr6T" target="_blank" rel="noopener" aria-label="TikTok">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M16.5 2c.4 2.4 2 4 4.5 4.2v3.1c-1.6.1-3.1-.4-4.5-1.3v6.6c0 3.6-2.6 6.4-6.3 6.4-3.6 0-6.4-2.8-6.4-6.4S6.6 8.2 10.2 8.2c.4 0 .8 0 1.2.1v3.3c-.4-.1-.8-.2-1.2-.2-1.8 0-3.2 1.4-3.2 3.2s1.4 3.2 3.2 3.2 3.3-1.3 3.3-3.1V2h3z" fill="currentColor"/></svg>
-        </a>
-        <a href="https://x.com/oscar_rojasc_?s=11&t=BxWIWbcISMwzg2Uzb_PjQA" target="_blank" rel="noopener" aria-label="X">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 3h4.2l4 5.5L16.8 3H20l-6.4 8.1L20.4 21H16.2l-4.4-6-5.3 6H3l6.8-8.6L4 3z" fill="currentColor"/></svg>
-        </a>
-        <a href="https://youtube.com/playlist?list=PLuJnrEPKGTVNtsjMhUeTVyw4r1icLWTZ6&si=_PKqaznTga0oL201" target="_blank" rel="noopener" aria-label="YouTube">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="2"/><path d="M10.5 9.5l5 2.5-5 2.5v-5z" fill="currentColor"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="footer-grid">
-      <div>
-        <div class="logo-lockup">
-          <img src="images/logo.png" alt="MentoryCap" class="logo-img footer-logo-img">
-          <span class="logo-text">MENTORY<span style="color:var(--gold)">CAP</span></span>
-        </div>
-        <p class="location">Panamá, Panamá</p>
-      </div>
-      <p>© <span id="year"></span> MentoryCap · Contacto: <span class="mail">mentorycap@gmail.com</span></p>
-    </div>
-  </div>
-</footer>
-
-<!-- ---------- MENÚ FLOTANTE + CHAT RÁPIDO ---------- -->
-<div class="fab-wrap">
-  <div class="fab-menu" id="fab-menu">
-    <button type="button" class="fab-item" onclick="closeFabMenu(); openModal('modal-mercado')">📊 El mercado hoy</button>
-    <a href="https://youtube.com/playlist?list=PLuJnrEPKGTVNtsjMhUeTVyw4r1icLWTZ6&si=_PKqaznTga0oL201" target="_blank" rel="noopener" class="fab-item" onclick="closeFabMenu()">▶️ Mi YouTube</a>
-    <button type="button" class="fab-item" onclick="closeFabMenu(); openModal('modal-enlaces')">🔗 Mis recursos</button>
-    <button type="button" class="fab-item fab-item-chat" onclick="openChat()">💬 Escríbeme</button>
-  </div>
-  <button type="button" class="fab-btn" id="fab-btn" onclick="toggleFabMenu()">
-    <span id="fab-icon">☰</span>
-  </button>
-</div>
-
-<div class="chat-backdrop" id="chat-backdrop" onclick="closeChat()"></div>
-<div class="chat-window" id="chat-window">
-  <div class="chat-header">
-    <div class="chat-header-info">
-      <img src="images/logo.png" alt="MentoryCap" class="chat-avatar">
-      <div>
-        <div class="chat-title">Oscar · MentoryCap</div>
-        <div class="chat-status"><span class="dot"></span> Te respondo por WhatsApp</div>
-      </div>
-    </div>
-    <button type="button" class="chat-close" onclick="closeChat()">✕</button>
-  </div>
-  <div class="chat-body">
-    <div class="chat-bubble">¡Hola! 👋 Cuéntame qué te interesa y te escribo directo a tu WhatsApp para ayudarte.</div>
-    <form id="chat-form">
-      <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
-      <input type="hidden" name="access_key" value="ae42ef7b-30d5-4486-9833-8983ad082046">
-      <input type="hidden" name="subject" value="Nuevo mensaje rápido desde el chat de la web">
-      <input type="hidden" name="from_name" value="Chat MentoryCap">
-      <input type="text" name="Nombre" placeholder="Tu nombre" required>
-      <input type="tel" name="WhatsApp" placeholder="Tu WhatsApp" required>
-      <textarea name="Mensaje" placeholder="Déjame un mensaje o cuéntame qué te interesó..." rows="3" required></textarea>
-      <button type="submit" class="btn btn-primary" id="chat-submit-btn">Enviar mensaje</button>
-      <div id="chat-msg"></div>
-    </form>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-  document.getElementById('year').textContent = new Date().getFullYear();
+/* =========================================================
+   CEJAS LOVELY — PANEL ADMINISTRATIVO
+   Almacenamiento: localStorage (un solo dispositivo/navegador)
+   ========================================================= */
 
-  // ---------- Mercado hoy: tarjetas estilo Bolsa de Apple ----------
-  let stocksRange = 'dia'; // 'dia' | 'semana' | 'mes' | 'todo'
+const STORAGE_KEY = 'cejasLovelyData_v1';
 
-  function setStocksRange(range, btn){
-    stocksRange = range;
-    document.querySelectorAll('.stocks-range-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    ['btc','xau','eurusd','dxy'].forEach(k => {
-      const el = document.getElementById(`stock-${k}-price`);
-      if (el) el.textContent = '…';
-    });
-    loadMarketCards();
-  }
-
-  function drawSparkline(svgId, points, isUp){
-    const svg = document.getElementById(svgId);
-    if (!svg || !points || points.length < 2) return;
-    const w = 300, h = 70, pad = 4;
-    const min = Math.min(...points), max = Math.max(...points);
-    const range = (max - min) || 1;
-    const stepX = (w - pad * 2) / (points.length - 1);
-    const coords = points.map((p, i) => {
-      const x = pad + i * stepX;
-      const y = pad + (h - pad * 2) * (1 - (p - min) / range);
-      return [x, y];
-    });
-    const linePath = coords.map((c, i) => (i === 0 ? 'M' : 'L') + c[0].toFixed(1) + ',' + c[1].toFixed(1)).join(' ');
-    const areaPath = linePath + ` L${coords[coords.length - 1][0].toFixed(1)},${h} L${coords[0][0].toFixed(1)},${h} Z`;
-    const color = isUp ? '#0B8A6B' : '#C8483C';
-    const gradId = svgId + '-grad';
-    svg.innerHTML = `
+function fallbackLogoSVG(){
+  const div = document.createElement('div');
+  div.className = 'brand-logo';
+  div.style.overflow = 'hidden';
+  div.innerHTML = `
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cejas Lovely" width="100%" height="100%">
       <defs>
-        <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${color}" stop-opacity="0.25"/>
-          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-        </linearGradient>
+        <radialGradient id="logoGrad" cx="50%" cy="42%" r="72%">
+          <stop offset="0%" stop-color="#f3fffb"/>
+          <stop offset="55%" stop-color="#7fe0cf"/>
+          <stop offset="100%" stop-color="#12796b"/>
+        </radialGradient>
       </defs>
-      <path d="${areaPath}" fill="url(#${gradId})" stroke="none"/>
-      <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    `;
-  }
+      <circle cx="50" cy="50" r="49" fill="url(#logoGrad)"/>
+      <g stroke="#1b1f1e" stroke-width="1.6" fill="none" stroke-linecap="round">
+        <path d="M14,44 Q26,30 40,36"/>
+        <path d="M13,52 Q27,46 42,49"/>
+        <path d="M13,52 L9,49 M17,54 L13,52 M22,55.5 L19,54 M28,56.5 L26,55.5 M35,57 L33,56.5 M42,49 L46,50" stroke-width="1.3"/>
+        <path d="M16,55 Q27,60 38,55" stroke-width="1.2" opacity="0.6"/>
+        <path d="M86,44 Q74,30 60,36"/>
+        <path d="M87,52 Q73,46 58,49"/>
+        <path d="M87,52 L91,49 M83,54 L87,52 M78,55.5 L81,54 M72,56.5 L74,55.5 M65,57 L67,56.5 M58,49 L54,50" stroke-width="1.3"/>
+        <path d="M84,55 Q73,60 62,55" stroke-width="1.2" opacity="0.6"/>
+      </g>
+    </svg>`;
+  return div;
+}
 
-  function renderStock(key, price, changePct, points, prefix){
-    const priceEl = document.getElementById(`stock-${key}-price`);
-    const changeEl = document.getElementById(`stock-${key}-change`);
-    if (!priceEl) return;
-    priceEl.textContent = prefix + price;
-    const isUp = changePct >= 0;
-    changeEl.textContent = (isUp ? '+' : '') + changePct.toFixed(2) + '%';
-    changeEl.className = 'stock-change ' + (isUp ? 'up' : 'down');
-    drawSparkline(`stock-${key}-chart`, points, isUp);
-  }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+// Usa la fecha LOCAL del dispositivo (no UTC). toISOString() convierte a UTC y
+// causaba que, en Panamá (UTC-5), a partir de las 7:00 PM ya se registrara el día siguiente.
+function toLocalISO(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function todayISO(){ return toLocalISO(new Date()); }
+function fmtMoney(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0); }
+function fmtDateHuman(iso){
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('es-PA',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+}
 
-  async function loadBinanceAsset(symbol, key, decimals){
-    try{
-      const interval = stocksRange === 'dia' ? '1h' : stocksRange === 'semana' ? '4h' : stocksRange === 'mes' ? '1d' : '1d';
-      const limit = stocksRange === 'dia' ? 24 : stocksRange === 'semana' ? 42 : stocksRange === 'mes' ? 30 : 365;
-      const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
-      const data = await res.json();
-      const prices = data.map(candle => parseFloat(candle[4]));
-      const first = prices[0], last = prices[prices.length - 1];
-      const changePct = ((last - first) / first) * 100;
-      const priceStr = decimals === 0
-        ? last.toLocaleString('en-US', {maximumFractionDigits: 0})
-        : last.toLocaleString('en-US', {maximumFractionDigits: decimals});
-      renderStock(key, priceStr, changePct, prices, '$');
-    } catch(e){
-      const el = document.getElementById(`stock-${key}-price`);
-      if (el) el.textContent = 'N/D';
+function defaultData(){
+  return {
+    services: {
+      cejas: [
+        {id:uid(), name:'Depilación de cejas', price:8},
+        {id:uid(), name:'Bozo', price:3},
+        {id:uid(), name:'Barbilla', price:3},
+        {id:uid(), name:'Mentón', price:3},
+        {id:uid(), name:'Frente', price:3},
+        {id:uid(), name:'Axilas', price:6},
+        {id:uid(), name:'Piernas', price:12},
+        {id:uid(), name:'Bikini', price:12},
+        {id:uid(), name:'Cejas semipermanente', price:80},
+        {id:uid(), name:'Pestañas punto a punto', price:35},
+        {id:uid(), name:'Lifting de pestañas', price:30},
+      ],
+      estilista: [
+        {id:uid(), name:'Corte de cabello', price:12},
+        {id:uid(), name:'Peinado', price:15},
+      ],
+      manicurista: [
+        {id:uid(), name:'Manicure clásica', price:10},
+        {id:uid(), name:'Pedicure clásica', price:12},
+      ]
+    },
+    incomes: [],
+    expenses: [],
+    appointments: [],
+    cashClosings: [],
+    settings: {
+      commissionPct: { cejas:0, estilista:0, manicurista:0 }
     }
-  }
+  };
+}
 
-  async function loadForexAndDXY(){
-    try{
-      const days = stocksRange === 'dia' ? 5 : stocksRange === 'semana' ? 9 : stocksRange === 'mes' ? 32 : 365;
-      const end = new Date();
-      const start = new Date();
-      start.setDate(end.getDate() - days);
-      const fmt = d => d.toISOString().slice(0, 10);
-      const url = `https://api.frankfurter.dev/v1/${fmt(start)}..${fmt(end)}?base=USD&symbols=EUR,JPY,GBP,CAD,SEK,CHF`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const dates = Object.keys(data.rates).sort();
-
-      const eurusdPoints = [];
-      const dxyPoints = [];
-      dates.forEach(d => {
-        const r = data.rates[d];
-        const eurusd = 1 / r.EUR;
-        const gbpusd = 1 / r.GBP;
-        const dxy = 50.14348112 *
-          Math.pow(eurusd, -0.576) *
-          Math.pow(r.JPY, 0.136) *
-          Math.pow(gbpusd, -0.119) *
-          Math.pow(r.CAD, 0.091) *
-          Math.pow(r.SEK, 0.042) *
-          Math.pow(r.CHF, 0.036);
-        eurusdPoints.push(eurusd);
-        dxyPoints.push(dxy);
-      });
-
-      const eFirst = eurusdPoints[0], eLast = eurusdPoints[eurusdPoints.length - 1];
-      renderStock('eurusd', eLast.toFixed(4), ((eLast - eFirst) / eFirst) * 100, eurusdPoints, '');
-
-      const dFirst = dxyPoints[0], dLast = dxyPoints[dxyPoints.length - 1];
-      renderStock('dxy', dLast.toFixed(2), ((dLast - dFirst) / dFirst) * 100, dxyPoints, '');
-    } catch(e){
-      const el1 = document.getElementById('stock-eurusd-price');
-      const el2 = document.getElementById('stock-dxy-price');
-      if (el1) el1.textContent = 'N/D';
-      if (el2) el2.textContent = 'N/D';
-    }
-  }
-
-  function loadMarketCards(){
-    loadBinanceAsset('BTCUSDT', 'btc', 0);
-    loadBinanceAsset('PAXGUSDT', 'xau', 2);
-    loadForexAndDXY();
-  }
-  loadMarketCards();
-
-  // Reloj de Nueva York + sesiones bursátiles activas (dentro del modal de mercado)
-  const marketSessions = [
-    { name: 'Nueva York', flag: '🇺🇸', tz: 'America/New_York', open: [9, 30],  close: [16, 0]  },
-    { name: 'Londres',    flag: '🇬🇧', tz: 'Europe/London',    open: [8, 0],   close: [16, 30] },
-    { name: 'Tokio',      flag: '🇯🇵', tz: 'Asia/Tokyo',       open: [9, 0],   close: [15, 0]  }
-  ];
-
-  function zonedParts(tz, date){
-    const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone: tz, hourCycle: 'h23',
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short'
-    }).formatToParts(date);
-    const map = {};
-    parts.forEach(p => map[p.type] = p.value);
-    return map;
-  }
-
-  function zonedOffsetMinutes(tz, date){
-    const m = zonedParts(tz, date);
-    const asUTC = Date.UTC(+m.year, +m.month - 1, +m.day, +m.hour, +m.minute, +m.second);
-    return Math.round((asUTC - date.getTime()) / 60000);
-  }
-
-  function zonedTimeToUTC(tz, hh, mm, referenceDate){
-    const m = zonedParts(tz, referenceDate);
-    const offset = zonedOffsetMinutes(tz, referenceDate);
-    const ms = Date.UTC(+m.year, +m.month - 1, +m.day, hh, mm, 0) - offset * 60000;
-    return new Date(ms);
-  }
-
-  function fmtNY(date){
-    return date.toLocaleTimeString('es-PA', {
-      timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) { const d = defaultData(); saveData(d); return d; }
+    const d = JSON.parse(raw);
+    // migración: agregar settings si vienen de una versión anterior
+    if(!d.settings) d.settings = { commissionPct: { cejas:0, estilista:0, manicurista:0 } };
+    if(!d.settings.commissionPct) d.settings.commissionPct = { cejas:0, estilista:0, manicurista:0 };
+    ['cejas','estilista','manicurista'].forEach(a=>{
+      if(typeof d.settings.commissionPct[a] !== 'number') d.settings.commissionPct[a] = 0;
     });
+    return d;
+  }catch(e){
+    console.error('Error leyendo datos, restaurando por defecto', e);
+    const d = defaultData(); saveData(d); return d;
   }
+}
+function saveData(d){ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
 
-  function updateClock(){
-    const clockEl = document.getElementById('clock-time');
-    if (!clockEl) return;
-    const now = new Date();
-    clockEl.textContent = new Date().toLocaleTimeString('es-PA', {
-      timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-    });
+let DB = loadData();
 
-    const chips = marketSessions.map(s => {
-      const weekday = zonedParts(s.tz, now).weekday;
-      const isWeekday = weekday !== 'Sat' && weekday !== 'Sun';
-      const openUTC = zonedTimeToUTC(s.tz, s.open[0], s.open[1], now);
-      const closeUTC = zonedTimeToUTC(s.tz, s.close[0], s.close[1], now);
-      const isOpen = isWeekday && now >= openUTC && now < closeUTC;
-      return `<span class="session-chip ${isOpen ? 'open' : ''}">
-        <span class="session-dot ${isOpen ? 'open' : 'closed'}"></span>
-        ${s.flag} ${s.name} · ${fmtNY(openUTC)}–${fmtNY(closeUTC)}
-      </span>`;
-    }).join('');
-    const sessEl = document.getElementById('sessions-list');
-    if (sessEl) sessEl.innerHTML = chips;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* ---------------- NAVIGATION ---------------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    if(btn.dataset.view==='dashboard') renderDashboard();
+    if(btn.dataset.view==='movimientos') renderMovimientos();
+    if(btn.dataset.view==='servicios') renderServicios();
+    if(btn.dataset.view==='calendario') renderCalendario();
+    if(btn.dataset.view==='caja') renderCaja();
+  });
+});
+
+/* ---------------- MODAL ---------------- */
+function openModal(title, innerHtml){
+  document.getElementById('modalBox').innerHTML =
+    `<button class="modal-close" onclick="closeModal()">&times;</button><h3>${title}</h3>${innerHtml}`;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
+document.getElementById('modalOverlay').addEventListener('click', e=>{
+  if(e.target.id==='modalOverlay') closeModal();
+});
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+let dashPeriod = 'day';
+let charts = {};
+
+function getPeriodRange(period, refDate){
+  const ref = refDate ? new Date(refDate+'T00:00:00') : new Date();
+  let start, end;
+  if(period==='day'){
+    start = new Date(ref); end = new Date(ref);
+  } else if(period==='week'){
+    const day = ref.getDay(); // 0 sun
+    const diffToMonday = (day===0? -6 : 1-day);
+    start = new Date(ref); start.setDate(ref.getDate()+diffToMonday);
+    end = new Date(start); end.setDate(start.getDate()+6);
+  } else { // month
+    start = new Date(ref.getFullYear(), ref.getMonth(), 1);
+    end = new Date(ref.getFullYear(), ref.getMonth()+1, 0);
   }
-  updateClock();
-  setInterval(updateClock, 1000);
+  return {start: toLocalISO(start), end: toLocalISO(end)};
+}
+function inRange(dateStr, start, end){ return dateStr>=start && dateStr<=end; }
 
-  // Menú flotante (FAB)
-  function toggleFabMenu(){
-    const menu = document.getElementById('fab-menu');
-    const icon = document.getElementById('fab-icon');
-    const isOpen = menu.classList.toggle('open');
-    icon.textContent = isOpen ? '✕' : '☰';
-  }
-  function closeFabMenu(){
-    document.getElementById('fab-menu').classList.remove('open');
-    document.getElementById('fab-icon').textContent = '☰';
-  }
+function computeStats(period){
+  const {start,end} = getPeriodRange(period);
+  const incomes = DB.incomes.filter(i=>inRange(i.date,start,end));
+  const expenses = DB.expenses.filter(e=>inRange(e.date,start,end));
+  const totalIncome = incomes.reduce((s,i)=>s+Number(i.price),0);
+  const totalExpense = expenses.reduce((s,e)=>s+Number(e.amount),0);
+  return {
+    start,end,incomes,expenses,
+    totalIncome, totalExpense, net: totalIncome-totalExpense,
+    servicesCount: incomes.length,
+    clientsCount: incomes.length /* cada ingreso registrado cuenta como un cliente atendido */
+  };
+}
 
-  // Ventanita de chat rápido
-  function openChat(servicio){
-    closeFabMenu();
-    document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
-    const msgField = document.querySelector('#chat-form textarea[name="Mensaje"]');
-    if (servicio && msgField && !msgField.value) {
-      msgField.value = 'Me interesa: ' + servicio + '. ';
+function renderDashboard(){
+  const stats = computeStats(dashPeriod);
+  const grid = document.getElementById('dashStats');
+  grid.innerHTML = `
+    <div class="stat-card">
+      <div class="label">Ingresos</div>
+      <div class="value">${fmtMoney(stats.totalIncome)}</div>
+    </div>
+    <div class="stat-card expense">
+      <div class="label">Gastos</div>
+      <div class="value">${fmtMoney(stats.totalExpense)}</div>
+    </div>
+    <div class="stat-card profit">
+      <div class="label">Ganancia neta</div>
+      <div class="value">${fmtMoney(stats.net)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Clientes atendidos</div>
+      <div class="value">${stats.clientsCount}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Servicios realizados</div>
+      <div class="value">${stats.servicesCount}</div>
+    </div>
+  `;
+
+  renderTrendChart();
+  renderCategoryChart(stats);
+  renderPaymentChart(stats);
+}
+
+document.getElementById('dashPeriodToggle').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  document.querySelectorAll('#dashPeriodToggle button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  dashPeriod = e.target.dataset.period;
+  renderDashboard();
+});
+
+function last14Days(){
+  const days = [];
+  for(let i=13;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(toLocalISO(d));
+  }
+  return days;
+}
+
+function renderTrendChart(){
+  const days = last14Days();
+  const incomeData = days.map(d=> DB.incomes.filter(i=>i.date===d).reduce((s,i)=>s+Number(i.price),0));
+  const expenseData = days.map(d=> DB.expenses.filter(e=>e.date===d).reduce((s,e)=>s+Number(e.amount),0));
+  const labels = days.map(d=> new Date(d+'T00:00:00').toLocaleDateString('es-PA',{day:'2-digit',month:'2-digit'}));
+
+  if(charts.trend) charts.trend.destroy();
+  charts.trend = new Chart(document.getElementById('chartTrend'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Ingresos', data:incomeData, borderColor:'#22a893', backgroundColor:'rgba(34,168,147,0.12)', fill:true, tension:0.35, pointRadius:2},
+        {label:'Gastos', data:expenseData, borderColor:'#c0554d', backgroundColor:'rgba(192,85,77,0.08)', fill:true, tension:0.35, pointRadius:2}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:11}}}},
+      scales:{ y:{ticks:{callback:v=>'$'+v}}, x:{ticks:{font:{size:10}}} }
     }
-    document.getElementById('chat-window').classList.add('open');
-    document.getElementById('chat-backdrop').classList.add('open');
+  });
+}
+
+function renderCategoryChart(stats){
+  const cats = ['cejas','estilista','manicurista'];
+  const labels = ['Cejas','Estilista','Manicurista'];
+  const data = cats.map(c=> stats.incomes.filter(i=>i.category===c).reduce((s,i)=>s+Number(i.price),0));
+  if(charts.cat) charts.cat.destroy();
+  charts.cat = new Chart(document.getElementById('chartCategory'), {
+    type:'doughnut',
+    data:{ labels, datasets:[{data, backgroundColor:['#22a893','#e08a3c','#a463d1'], borderWidth:0}] },
+    options:{ responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:11}}}} }
+  });
+}
+
+function renderPaymentChart(stats){
+  const efectivo = stats.incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
+  const yappy = stats.incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
+  if(charts.pay) charts.pay.destroy();
+  charts.pay = new Chart(document.getElementById('chartPayment'), {
+    type:'doughnut',
+    data:{ labels:['Efectivo','Yappy'], datasets:[{data:[efectivo,yappy], backgroundColor:['#5a8a2c','#2f5fad'], borderWidth:0}] },
+    options:{ responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:11}}}} }
+  });
+}
+
+/* =========================================================
+   MOVIMIENTOS (INGRESOS / GASTOS)
+   ========================================================= */
+function populateServiceSelect(){
+  const cat = document.getElementById('ing-categoria').value;
+  const sel = document.getElementById('ing-servicio');
+  sel.innerHTML = DB.services[cat].map(s=>`<option value="${s.id}" data-price="${s.price}">${s.name} — ${fmtMoney(s.price)}</option>`).join('') +
+    `<option value="__custom__">Otro (personalizado)</option>`;
+  const first = DB.services[cat][0];
+  document.getElementById('ing-precio').value = first ? first.price : '';
+}
+document.getElementById('ing-categoria').addEventListener('change', populateServiceSelect);
+document.getElementById('ing-servicio').addEventListener('change', e=>{
+  const opt = e.target.selectedOptions[0];
+  if(opt.value==='__custom__'){
+    document.getElementById('ing-precio').value = '';
+  } else {
+    document.getElementById('ing-precio').value = opt.dataset.price;
   }
-  function closeChat(){
-    document.getElementById('chat-window').classList.remove('open');
-    document.getElementById('chat-backdrop').classList.remove('open');
+});
+
+document.querySelectorAll('.mv-tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.mv-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const isIngreso = btn.dataset.mv==='ingreso';
+    document.getElementById('formIngreso').style.display = isIngreso? 'block':'none';
+    document.getElementById('formGasto').style.display = isIngreso? 'none':'block';
+  });
+});
+
+document.getElementById('formIngreso').addEventListener('submit', e=>{
+  e.preventDefault();
+  const editId = document.getElementById('ing-editId').value;
+  const catSel = document.getElementById('ing-categoria').value;
+  const servSel = document.getElementById('ing-servicio');
+  const opt = servSel.selectedOptions[0];
+  const serviceName = opt.value==='__custom__' ? prompt('Nombre del servicio personalizado:','Servicio') : opt.textContent.split(' — ')[0];
+
+  const record = {
+    id: editId || uid(),
+    date: document.getElementById('ing-fecha').value,
+    category: catSel,
+    serviceName: serviceName || 'Servicio',
+    client: document.getElementById('ing-cliente').value.trim(),
+    price: parseFloat(document.getElementById('ing-precio').value)||0,
+    payment: document.getElementById('ing-pago').value,
+    notes: document.getElementById('ing-notas').value.trim()
+  };
+  if(editId){
+    const idx = DB.incomes.findIndex(i=>i.id===editId);
+    if(idx>-1) DB.incomes[idx] = record;
+    toast('Ingreso actualizado');
+  } else {
+    DB.incomes.push(record);
+    toast('Ingreso registrado');
   }
+  saveData(DB);
+  resetIngresoForm();
+  renderMovimientos();
+});
 
-  const chatForm = document.getElementById('chat-form');
-  const chatMsg = document.getElementById('chat-msg');
-  const chatBtn = document.getElementById('chat-submit-btn');
+document.getElementById('ing-cancel').addEventListener('click', resetIngresoForm);
+function resetIngresoForm(){
+  document.getElementById('formIngreso').reset();
+  document.getElementById('ing-editId').value='';
+  document.getElementById('ing-cancel').style.display='none';
+  document.getElementById('ing-fecha').value = todayISO();
+  populateServiceSelect();
+}
 
-  chatForm.addEventListener('submit', async function(e){
-    e.preventDefault();
-    chatBtn.disabled = true;
-    chatBtn.textContent = 'Enviando...';
-    chatMsg.className = '';
-    chatMsg.style.display = 'none';
+document.getElementById('formGasto').addEventListener('submit', e=>{
+  e.preventDefault();
+  const editId = document.getElementById('gas-editId').value;
+  const record = {
+    id: editId || uid(),
+    date: document.getElementById('gas-fecha').value,
+    category: document.getElementById('gas-categoria').value,
+    description: document.getElementById('gas-desc').value.trim(),
+    amount: parseFloat(document.getElementById('gas-monto').value)||0,
+    payment: document.getElementById('gas-pago').value
+  };
+  if(editId){
+    const idx = DB.expenses.findIndex(x=>x.id===editId);
+    if(idx>-1) DB.expenses[idx]=record;
+    toast('Gasto actualizado');
+  } else {
+    DB.expenses.push(record);
+    toast('Gasto registrado');
+  }
+  saveData(DB);
+  resetGastoForm();
+  renderMovimientos();
+});
+document.getElementById('gas-cancel').addEventListener('click', resetGastoForm);
+function resetGastoForm(){
+  document.getElementById('formGasto').reset();
+  document.getElementById('gas-editId').value='';
+  document.getElementById('gas-cancel').style.display='none';
+  document.getElementById('gas-fecha').value = todayISO();
+}
 
-    const formData = new FormData(chatForm);
-    try{
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: formData
-      });
-      const result = await response.json();
-      if (result.success){
-        chatMsg.textContent = '¡Listo! Te escribo pronto a tu WhatsApp.';
-        chatMsg.className = 'ok';
-        chatForm.reset();
+function editIncome(id){
+  const rec = DB.incomes.find(i=>i.id===id);
+  if(!rec) return;
+  document.querySelector('.mv-tab[data-mv="ingreso"]').click();
+  document.getElementById('ing-editId').value = rec.id;
+  document.getElementById('ing-fecha').value = rec.date;
+  document.getElementById('ing-categoria').value = rec.category;
+  populateServiceSelect();
+  document.getElementById('ing-cliente').value = rec.client;
+  document.getElementById('ing-precio').value = rec.price;
+  document.getElementById('ing-pago').value = rec.payment;
+  document.getElementById('ing-notas').value = rec.notes||'';
+  document.getElementById('ing-cancel').style.display='inline-block';
+  document.getElementById('mv-form-card').scrollIntoView({behavior:'smooth'});
+}
+function deleteIncome(id){
+  if(!confirm('¿Eliminar este ingreso?')) return;
+  DB.incomes = DB.incomes.filter(i=>i.id!==id);
+  saveData(DB); renderMovimientos(); toast('Ingreso eliminado');
+}
+function editExpense(id){
+  const rec = DB.expenses.find(i=>i.id===id);
+  if(!rec) return;
+  document.querySelector('.mv-tab[data-mv="gasto"]').click();
+  document.getElementById('gas-editId').value = rec.id;
+  document.getElementById('gas-fecha').value = rec.date;
+  document.getElementById('gas-categoria').value = rec.category;
+  document.getElementById('gas-desc').value = rec.description;
+  document.getElementById('gas-monto').value = rec.amount;
+  document.getElementById('gas-pago').value = rec.payment;
+  document.getElementById('gas-cancel').style.display='inline-block';
+  document.getElementById('mv-form-card').scrollIntoView({behavior:'smooth'});
+}
+function deleteExpense(id){
+  if(!confirm('¿Eliminar este gasto?')) return;
+  DB.expenses = DB.expenses.filter(i=>i.id!==id);
+  saveData(DB); renderMovimientos(); toast('Gasto eliminado');
+}
+
+document.getElementById('filterDesde').addEventListener('change', renderMovimientos);
+document.getElementById('filterHasta').addEventListener('change', renderMovimientos);
+
+function renderMovimientos(){
+  const desde = document.getElementById('filterDesde').value;
+  const hasta = document.getElementById('filterHasta').value;
+  let items = [];
+  DB.incomes.forEach(i=> items.push({type:'ingreso', ...i, amount:i.price}));
+  DB.expenses.forEach(e=> items.push({type:'gasto', ...e}));
+  if(desde) items = items.filter(x=>x.date>=desde);
+  if(hasta) items = items.filter(x=>x.date<=hasta);
+  items.sort((a,b)=> b.date.localeCompare(a.date));
+
+  const tbody = document.getElementById('movTableBody');
+  if(items.length===0){
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-msg">Aún no hay movimientos registrados</td></tr>`;
+  } else {
+    tbody.innerHTML = items.map(x=>{
+      if(x.type==='ingreso'){
+        return `<tr>
+          <td>${x.date}</td>
+          <td><span class="pill ${x.category}">${x.category}</span></td>
+          <td>${x.serviceName}</td>
+          <td>${x.client||'—'}</td>
+          <td><span class="pill ${x.payment}">${x.payment}</span></td>
+          <td style="color:var(--teal-dark);font-weight:600;">+${fmtMoney(x.amount)}</td>
+          <td class="row-actions">
+            <button onclick="editIncome('${x.id}')" title="Editar">✎</button>
+            <button class="del" onclick="deleteIncome('${x.id}')" title="Eliminar">🗑</button>
+          </td>
+        </tr>`;
       } else {
-        chatMsg.textContent = 'No se pudo enviar. Intenta de nuevo.';
-        chatMsg.className = 'err';
+        return `<tr>
+          <td>${x.date}</td>
+          <td><span class="pill" style="background:var(--danger-light);color:var(--danger);">${x.category}</span></td>
+          <td>${x.description}</td>
+          <td>—</td>
+          <td><span class="pill ${x.payment}">${x.payment}</span></td>
+          <td style="color:var(--danger);font-weight:600;">−${fmtMoney(x.amount)}</td>
+          <td class="row-actions">
+            <button onclick="editExpense('${x.id}')" title="Editar">✎</button>
+            <button class="del" onclick="deleteExpense('${x.id}')" title="Eliminar">🗑</button>
+          </td>
+        </tr>`;
       }
-    } catch(err){
-      chatMsg.textContent = 'Error de conexión. Intenta de nuevo.';
-      chatMsg.className = 'err';
-    } finally {
-      chatBtn.disabled = false;
-      chatBtn.textContent = 'Enviar mensaje';
-    }
-  });
-  const top10Coins = [
-    { symbol: 'BTCUSDT', name: 'Bitcoin', tag: 'BTC', color: '#F7931A' },
-    { symbol: 'ETHUSDT', name: 'Ethereum', tag: 'ETH', color: '#8A92B2' },
-    { symbol: 'XRPUSDT', name: 'XRP', tag: 'XRP', color: '#5B8DEF' },
-    { symbol: 'BNBUSDT', name: 'BNB', tag: 'BNB', color: '#F0B90B' },
-    { symbol: 'SOLUSDT', name: 'Solana', tag: 'SOL', color: '#9B6BFF' },
-    { symbol: 'DOGEUSDT', name: 'Dogecoin', tag: 'DOGE', color: '#C2A633' },
-    { symbol: 'ADAUSDT', name: 'Cardano', tag: 'ADA', color: '#5B8DEF' },
-    { symbol: 'TRXUSDT', name: 'TRON', tag: 'TRX', color: '#C8483C' },
-    { symbol: 'LINKUSDT', name: 'Chainlink', tag: 'LINK', color: '#375BD2' },
-    { symbol: 'DOTUSDT', name: 'Polkadot', tag: 'DOT', color: '#E6007A' }
-  ];
-  const symbolsParam = encodeURIComponent(JSON.stringify(top10Coins.map(c => c.symbol)));
-  fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${symbolsParam}`)
-    .then(res => res.json())
-    .then(tickers => {
-      const list = document.getElementById('top10-list');
-      if (!Array.isArray(tickers)) throw new Error('respuesta inesperada');
-      const bySymbol = {};
-      tickers.forEach(t => bySymbol[t.symbol] = t);
-      list.innerHTML = top10Coins.map((c, i) => {
-        const t = bySymbol[c.symbol];
-        const change = t ? parseFloat(t.priceChangePercent) : 0;
-        const price = t ? parseFloat(t.lastPrice) : 0;
-        const changeClass = change >= 0 ? 'up' : 'down';
-        const changeSign = change >= 0 ? '+' : '';
-        const priceStr = price >= 1
-          ? '$' + price.toLocaleString('en-US', {maximumFractionDigits: 2})
-          : '$' + price.toPrecision(4);
-        return `<div class="top20-row" id="row-${c.symbol}" onclick="showCryptoDetail('${c.symbol}', '${c.name}', '${c.tag}')">
-          <span class="top20-rank">${i + 1}</span>
-          <span class="top20-icon" style="background:${c.color}22;color:${c.color};">${c.tag.slice(0, 2)}</span>
-          <span class="top20-name">${c.name}<span class="sym">${c.tag}</span></span>
-          <span class="top20-price">${priceStr}</span>
-          <span class="top20-change ${changeClass}">${changeSign}${change.toFixed(2)}%</span>
-        </div>`;
-      }).join('');
-    })
-    .catch(() => {
-      document.getElementById('top10-list').innerHTML = '<p class="calc-note">No se pudo cargar el top 10 en este momento. Intenta recargar la página.</p>';
-    });
-
-  // Gráfica de detalle al hacer clic en una criptomoneda del top 10
-  let cryptoDetailSymbol = null;
-  let cryptoDetailRange = 'dia';
-
-  function showCryptoDetail(symbol, name, tag){
-    cryptoDetailSymbol = symbol;
-    document.querySelectorAll('.top20-row').forEach(r => r.classList.remove('active'));
-    const row = document.getElementById(`row-${symbol}`);
-    if (row) row.classList.add('active');
-    document.getElementById('crypto-detail-symbol').textContent = tag + '/USDT';
-    document.getElementById('crypto-detail-name').textContent = name;
-    const card = document.getElementById('crypto-detail-card');
-    card.style.display = 'block';
-    card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
-    loadCryptoDetail();
+    }).join('');
   }
+}
 
-  function hideCryptoDetail(){
-    document.getElementById('crypto-detail-card').style.display = 'none';
-    document.querySelectorAll('.top20-row').forEach(r => r.classList.remove('active'));
-    cryptoDetailSymbol = null;
-  }
+/* =========================================================
+   SERVICIOS
+   ========================================================= */
+const catMeta = {
+  cejas:{label:'Cejas', dot:'cejas'},
+  estilista:{label:'Estilista', dot:'estilista'},
+  manicurista:{label:'Manicurista', dot:'manicurista'}
+};
 
-  function setCryptoDetailRange(range, btn){
-    cryptoDetailRange = range;
-    document.querySelectorAll('#crypto-detail-range .stocks-range-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    loadCryptoDetail();
-  }
+function renderServicios(){
+  const wrap = document.getElementById('serviceColumns');
+  wrap.innerHTML = Object.keys(catMeta).map(cat=>{
+    const items = DB.services[cat];
+    const meta = catMeta[cat];
+    const itemsHtml = items.length? items.map(s=>`
+      <div class="service-item">
+        <span class="sname">${s.name}</span>
+        <span class="sprice">${fmtMoney(s.price)}</span>
+        <button class="btn ghost small" onclick="editService('${cat}','${s.id}')">✎</button>
+        <button class="btn ghost small" style="color:var(--danger);border-color:var(--danger-light);" onclick="deleteService('${cat}','${s.id}')">🗑</button>
+      </div>
+    `).join('') : `<div class="empty-msg">Sin servicios aún</div>`;
+    return `
+      <div class="card service-col">
+        <h3><span class="dot ${meta.dot}"></span> ${meta.label}</h3>
+        ${itemsHtml}
+        <form class="add-service-form" onsubmit="addService(event,'${cat}')">
+          <input type="text" placeholder="Nuevo servicio" required id="new-name-${cat}">
+          <input type="number" step="0.01" min="0" placeholder="Precio" required style="max-width:100px;" id="new-price-${cat}">
+          <button type="submit" class="btn small">＋</button>
+        </form>
+      </div>
+    `;
+  }).join('');
+}
 
-  async function loadCryptoDetail(){
-    if (!cryptoDetailSymbol) return;
-    const priceEl = document.getElementById('crypto-detail-price');
-    priceEl.textContent = '…';
-    try{
-      const interval = cryptoDetailRange === 'dia' ? '1h' : cryptoDetailRange === 'semana' ? '4h' : '1d';
-      const limit = cryptoDetailRange === 'dia' ? 24 : cryptoDetailRange === 'semana' ? 42 : cryptoDetailRange === 'mes' ? 30 : 365;
-      const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cryptoDetailSymbol}&interval=${interval}&limit=${limit}`);
-      const data = await res.json();
-      const prices = data.map(c => parseFloat(c[4]));
-      const first = prices[0], last = prices[prices.length - 1];
-      const changePct = ((last - first) / first) * 100;
-      const isUp = changePct >= 0;
-      priceEl.textContent = '$' + last.toLocaleString('en-US', {maximumFractionDigits: last >= 1 ? 2 : 6});
-      const changeEl = document.getElementById('crypto-detail-change');
-      changeEl.textContent = (isUp ? '+' : '') + changePct.toFixed(2) + '%';
-      changeEl.className = 'stock-change ' + (isUp ? 'up' : 'down');
-      drawSparkline('crypto-detail-chart', prices, isUp);
-    } catch(e){
-      priceEl.textContent = 'N/D';
-    }
-  }
+function addService(e, cat){
+  e.preventDefault();
+  const nameInput = document.getElementById(`new-name-${cat}`);
+  const priceInput = document.getElementById(`new-price-${cat}`);
+  DB.services[cat].push({id:uid(), name:nameInput.value.trim(), price:parseFloat(priceInput.value)||0});
+  saveData(DB);
+  renderServicios();
+  toast('Servicio agregado');
+}
 
-  // Modales de detalle de cada servicio
-  function openModal(id){
-    document.getElementById(id).classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal(id){
-    document.getElementById(id).classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  function switchTab(btn, panelId){
-    const modal = btn.closest('.modal-box');
-    modal.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
-    modal.querySelectorAll('.modal-tab-panel').forEach(p => p.style.display = 'none');
-    btn.classList.add('active');
-    document.getElementById(panelId).style.display = 'block';
-  }
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){
-      document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
-    }
-  });
+function editService(cat, id){
+  const s = DB.services[cat].find(x=>x.id===id);
+  if(!s) return;
+  openModal('Editar servicio', `
+    <div class="form-grid">
+      <div><label>Nombre</label><input type="text" id="edit-sname" value="${s.name}"></div>
+      <div><label>Precio (US$)</label><input type="number" step="0.01" min="0" id="edit-sprice" value="${s.price}"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="saveServiceEdit('${cat}','${id}')">Guardar</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
+    </div>
+  `);
+}
+function saveServiceEdit(cat,id){
+  const s = DB.services[cat].find(x=>x.id===id);
+  s.name = document.getElementById('edit-sname').value.trim();
+  s.price = parseFloat(document.getElementById('edit-sprice').value)||0;
+  saveData(DB);
+  closeModal();
+  renderServicios();
+  toast('Servicio actualizado');
+}
+function deleteService(cat,id){
+  if(!confirm('¿Eliminar este servicio?')) return;
+  DB.services[cat] = DB.services[cat].filter(x=>x.id!==id);
+  saveData(DB);
+  renderServicios();
+  toast('Servicio eliminado');
+}
 
-  // Botones "Quiero más información" (dentro de los modales): abren el chat rápido con el servicio preseleccionado.
-  document.querySelectorAll('.js-contacto').forEach(btn => {
-    btn.addEventListener('click', function(e){
-      e.preventDefault();
-      openChat(this.dataset.servicio);
-    });
-  });
+/* =========================================================
+   CALENDARIO
+   ========================================================= */
+let calRefDate = new Date();
+let calMode = 'month';
+
+document.getElementById('calViewToggle').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  document.querySelectorAll('#calViewToggle button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  calMode = e.target.dataset.calview;
+  document.getElementById('calMonthView').style.display = calMode==='month'?'block':'none';
+  document.getElementById('calWeekView').style.display = calMode==='week'?'block':'none';
+  renderCalendario();
+});
+document.getElementById('calPrev').addEventListener('click', ()=>{ calRefDate.setMonth(calRefDate.getMonth()-1); renderCalendario(); });
+document.getElementById('calNext').addEventListener('click', ()=>{ calRefDate.setMonth(calRefDate.getMonth()+1); renderCalendario(); });
+document.getElementById('calWeekPrev').addEventListener('click', ()=>{ calRefDate.setDate(calRefDate.getDate()-7); renderCalendario(); });
+document.getElementById('calWeekNext').addEventListener('click', ()=>{ calRefDate.setDate(calRefDate.getDate()+7); renderCalendario(); });
+document.getElementById('btnNuevaCita').addEventListener('click', ()=> openAppointmentModal());
+
+const DOW = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+
+function renderCalendario(){
+  document.getElementById('calDowRow').innerHTML = DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  if(calMode==='month') renderMonthGrid(); else renderWeekList();
+}
+
+function renderMonthGrid(){
+  const y = calRefDate.getFullYear(), m = calRefDate.getMonth();
+  document.getElementById('calMonthLabel').textContent = calRefDate.toLocaleDateString('es-PA',{month:'long',year:'numeric'});
+  const firstDay = new Date(y,m,1);
+  let startOffset = firstDay.getDay()-1; if(startOffset<0) startOffset=6;
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const todayStr = todayISO();
+
+  let cells = [];
+  for(let i=0;i<startOffset;i++) cells.push(null);
+  for(let d=1; d<=daysInMonth; d++) cells.push(d);
+  while(cells.length % 7 !== 0) cells.push(null);
+
+  document.getElementById('calGrid').innerHTML = cells.map(d=>{
+    if(!d) return `<div class="cal-day muted"></div>`;
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const apts = DB.appointments.filter(a=>a.date===dateStr);
+    const isToday = dateStr===todayStr;
+    return `<div class="cal-day ${isToday?'today':''}" onclick="openDayDetail('${dateStr}')">
+      <div class="dnum">${d}</div>
+      ${apts.length? `<span class="apt-count">${apts.length} cita${apts.length>1?'s':''}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderWeekList(){
+  const ref = new Date(calRefDate);
+  const day = ref.getDay(); const diffToMonday = (day===0?-6:1-day);
+  const monday = new Date(ref); monday.setDate(ref.getDate()+diffToMonday);
+  const days = [];
+  for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); days.push(d); }
+  document.getElementById('calWeekLabel').textContent =
+    `${days[0].toLocaleDateString('es-PA',{day:'2-digit',month:'short'})} – ${days[6].toLocaleDateString('es-PA',{day:'2-digit',month:'short',year:'numeric'})}`;
+
+  document.getElementById('weekList').innerHTML = days.map(d=>{
+    const dateStr = toLocalISO(d);
+    const apts = DB.appointments.filter(a=>a.date===dateStr).sort((a,b)=>a.time.localeCompare(b.time));
+    return `<div class="week-day-block">
+      <h4>${d.toLocaleDateString('es-PA',{weekday:'long',day:'2-digit',month:'short'})}</h4>
+      ${apts.length? apts.map(a=>`
+        <div class="apt-row">
+          <span><strong>${a.time}</strong> — ${a.client} <span class="pill ${a.category}">${a.category}</span> ${a.serviceName}</span>
+          <span class="row-actions">
+            <button onclick="editAppointment('${a.id}')">✎</button>
+            <button class="del" onclick="deleteAppointment('${a.id}')">🗑</button>
+          </span>
+        </div>`).join('') : `<div class="empty-msg" style="padding:8px 0;">Sin citas</div>`}
+      <button class="btn ghost small" style="margin-top:8px;" onclick="openAppointmentModal('${dateStr}')">＋ Agregar cita</button>
+    </div>`;
+  }).join('');
+}
+
+function openDayDetail(dateStr){
+  const apts = DB.appointments.filter(a=>a.date===dateStr).sort((a,b)=>a.time.localeCompare(b.time));
+  openModal(`Citas — ${fmtDateHuman(dateStr)}`, `
+    <div id="dayAptList">
+      ${apts.length? apts.map(a=>`
+        <div class="apt-row">
+          <span><strong>${a.time}</strong> — ${a.client} <span class="pill ${a.category}">${a.category}</span> ${a.serviceName}</span>
+          <span class="row-actions">
+            <button onclick="editAppointment('${a.id}')">✎</button>
+            <button class="del" onclick="deleteAppointment('${a.id}')">🗑</button>
+          </span>
+        </div>`).join('') : `<div class="empty-msg">Sin citas este día</div>`}
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="closeModal(); openAppointmentModal('${dateStr}')">＋ Nueva cita este día</button>
+    </div>
+  `);
+}
+
+function openAppointmentModal(dateStr, editId){
+  const rec = editId ? DB.appointments.find(a=>a.id===editId) : null;
+  const date = rec ? rec.date : (dateStr || todayISO());
+  const catOptions = Object.keys(catMeta).map(c=>`<option value="${c}" ${rec&&rec.category===c?'selected':''}>${catMeta[c].label}</option>`).join('');
+  openModal(rec? 'Editar cita' : 'Nueva cita', `
+    <div class="form-grid">
+      <div><label>Fecha</label><input type="date" id="apt-date" value="${date}"></div>
+      <div><label>Hora</label><input type="time" id="apt-time" value="${rec?rec.time:'10:00'}"></div>
+      <div><label>Cliente</label><input type="text" id="apt-client" value="${rec?rec.client:''}" placeholder="Nombre del cliente"></div>
+      <div><label>Categoría</label><select id="apt-category">${catOptions}</select></div>
+      <div><label>Servicio</label><input type="text" id="apt-service" value="${rec?rec.serviceName:''}" placeholder="Ej. Cejas semipermanente"></div>
+    </div>
+    <div style="margin-top:12px;"><label>Notas</label><input type="text" id="apt-notes" value="${rec?(rec.notes||''):''}"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="saveAppointment(${editId?`'${editId}'`:'null'})">Guardar cita</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
+    </div>
+  `);
+}
+function editAppointment(id){ closeModal(); openAppointmentModal(null, id); }
+
+function saveAppointment(editId){
+  const record = {
+    id: editId || uid(),
+    date: document.getElementById('apt-date').value,
+    time: document.getElementById('apt-time').value,
+    client: document.getElementById('apt-client').value.trim(),
+    category: document.getElementById('apt-category').value,
+    serviceName: document.getElementById('apt-service').value.trim(),
+    notes: document.getElementById('apt-notes').value.trim(),
+    status: 'confirmado'
+  };
+  if(editId){
+    const idx = DB.appointments.findIndex(a=>a.id===editId);
+    if(idx>-1) DB.appointments[idx]=record;
+    toast('Cita actualizada');
+  } else {
+    DB.appointments.push(record);
+    toast('Cita agregada');
+  }
+  saveData(DB);
+  closeModal();
+  renderCalendario();
+}
+function deleteAppointment(id){
+  if(!confirm('¿Eliminar esta cita?')) return;
+  DB.appointments = DB.appointments.filter(a=>a.id!==id);
+  saveData(DB);
+  closeModal();
+  renderCalendario();
+}
+
+/* =========================================================
+   CIERRE DE CAJA
+   ========================================================= */
+document.getElementById('cajaFecha').addEventListener('change', renderCaja);
+
+function renderCaja(){
+  const fechaInput = document.getElementById('cajaFecha');
+  if(!fechaInput.value) fechaInput.value = todayISO();
+  const fecha = fechaInput.value;
+
+  const incomes = DB.incomes.filter(i=>i.date===fecha);
+  const expenses = DB.expenses.filter(e=>e.date===fecha);
+  const cashIn = incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
+  const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
+  const cashOut = expenses.filter(e=>e.payment==='efectivo').reduce((s,e)=>s+Number(e.amount),0);
+  const yappyOut = expenses.filter(e=>e.payment==='yappy').reduce((s,e)=>s+Number(e.amount),0);
+  const totalIn = cashIn+yappyIn, totalOut = cashOut+yappyOut, net = totalIn-totalOut;
+  const clientsCount = incomes.length;
+
+  document.getElementById('cajaResumenCard').innerHTML = `
+    <div class="page-header" style="margin-bottom:0;">
+      <h3 style="margin:0;font-size:16px;">Resumen general — ${fmtDateHuman(fecha)}</h3>
+    </div>
+    <div class="cierre-summary">
+      <div class="item"><div class="k">Ingresos efectivo</div><div class="v">${fmtMoney(cashIn)}</div></div>
+      <div class="item"><div class="k">Ingresos Yappy</div><div class="v">${fmtMoney(yappyIn)}</div></div>
+      <div class="item"><div class="k">Total ingresos</div><div class="v" style="color:var(--teal-dark);">${fmtMoney(totalIn)}</div></div>
+      <div class="item"><div class="k">Gastos efectivo</div><div class="v">${fmtMoney(cashOut)}</div></div>
+      <div class="item"><div class="k">Gastos Yappy</div><div class="v">${fmtMoney(yappyOut)}</div></div>
+      <div class="item"><div class="k">Total gastos</div><div class="v" style="color:var(--danger);">${fmtMoney(totalOut)}</div></div>
+      <div class="item"><div class="k">Ganancia neta</div><div class="v" style="color:var(--teal-dark);">${fmtMoney(net)}</div></div>
+      <div class="item"><div class="k">Clientes atendidos</div><div class="v">${clientsCount}</div></div>
+    </div>
+    <div class="btn-row no-print">
+      <button class="btn ghost" onclick="window.print()">🖨 Imprimir reporte</button>
+    </div>
+  `;
+
+  renderCajaAreaCards(fecha);
+  renderCierreHistorial();
+}
+
+function renderCajaAreaCards(fecha){
+  const wrap = document.getElementById('cajaAreaCards');
+  wrap.innerHTML = Object.keys(catMeta).map(area=>{
+    const meta = catMeta[area];
+    const incomes = DB.incomes.filter(i=>i.date===fecha && i.category===area);
+    const cashIn = incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
+    const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
+    const totalIn = cashIn+yappyIn;
+    const clientsCount = incomes.length;
+    const pct = DB.settings.commissionPct[area] ?? 0;
+    const commissionAmount = totalIn * (pct/100);
+    const netSalon = totalIn - commissionAmount;
+
+    const existing = DB.cashClosings.find(c=>c.date===fecha && c.area===area);
+
+    return `
+      <div class="card service-col">
+        <div class="page-header" style="margin-bottom:8px;">
+          <h3 style="margin:0;"><span class="dot ${meta.dot}"></span> ${meta.label}</h3>
+          ${existing? `<span class="badge-locked">🔒 ${existing.closedAt}</span>` : ''}
+        </div>
+        <div class="cierre-summary" style="grid-template-columns:1fr 1fr;">
+          <div class="item"><div class="k">Efectivo</div><div class="v">${fmtMoney(cashIn)}</div></div>
+          <div class="item"><div class="k">Yappy</div><div class="v">${fmtMoney(yappyIn)}</div></div>
+          <div class="item"><div class="k">Total ingresos</div><div class="v" style="color:var(--teal-dark);">${fmtMoney(totalIn)}</div></div>
+          <div class="item"><div class="k">Clientes</div><div class="v">${clientsCount}</div></div>
+        </div>
+        <div style="margin-top:14px;">
+          <label>% Comisión trabajadora</label>
+          <input type="number" min="0" max="100" step="0.5" id="pct-${area}" value="${pct}" oninput="updateAreaCalc('${area}','${fecha}')">
+        </div>
+        <div class="cierre-summary" style="grid-template-columns:1fr 1fr;margin-top:10px;">
+          <div class="item"><div class="k">Pago a trabajadora</div><div class="v" id="pay-${area}" style="color:var(--gold);">${fmtMoney(commissionAmount)}</div></div>
+          <div class="item"><div class="k">Neto para el salón</div><div class="v" id="net-${area}" style="color:var(--teal-dark);">${fmtMoney(netSalon)}</div></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn small" onclick="closeAreaCashRegister('${fecha}','${area}')">${existing? '🔒 Volver a cerrar' : '🔒 Cerrar caja de ' + meta.label}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateAreaCalc(area, fecha){
+  const incomes = DB.incomes.filter(i=>i.date===fecha && i.category===area);
+  const totalIn = incomes.reduce((s,i)=>s+Number(i.price),0);
+  const pct = parseFloat(document.getElementById(`pct-${area}`).value)||0;
+  const commissionAmount = totalIn * (pct/100);
+  const netSalon = totalIn - commissionAmount;
+  document.getElementById(`pay-${area}`).textContent = fmtMoney(commissionAmount);
+  document.getElementById(`net-${area}`).textContent = fmtMoney(netSalon);
+}
+
+function closeAreaCashRegister(fecha, area){
+  const incomes = DB.incomes.filter(i=>i.date===fecha && i.category===area);
+  const cashIn = incomes.filter(i=>i.payment==='efectivo').reduce((s,i)=>s+Number(i.price),0);
+  const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
+  const totalIn = cashIn+yappyIn;
+  const clientsCount = incomes.length;
+  const pct = parseFloat(document.getElementById(`pct-${area}`).value)||0;
+  const commissionAmount = totalIn * (pct/100);
+  const netSalon = totalIn - commissionAmount;
+
+  // guarda el % como valor por defecto para la próxima vez
+  DB.settings.commissionPct[area] = pct;
+
+  const existingIdx = DB.cashClosings.findIndex(c=>c.date===fecha && c.area===area);
+  const record = {
+    id: existingIdx>-1? DB.cashClosings[existingIdx].id : uid(),
+    date: fecha,
+    area,
+    cashIncome:cashIn, yappyIncome:yappyIn, totalIncome:totalIn,
+    clientsCount,
+    commissionPct: pct,
+    commissionAmount,
+    netSalon,
+    closedAt: new Date().toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})
+  };
+  if(existingIdx>-1){
+    if(!confirm(`Ya existe un cierre de ${catMeta[area].label} para este día. ¿Deseas actualizarlo con los datos actuales?`)) return;
+    DB.cashClosings[existingIdx] = record;
+  } else {
+    DB.cashClosings.push(record);
+  }
+  saveData(DB);
+  toast(`Caja de ${catMeta[area].label} cerrada correctamente`);
+  renderCaja();
+}
+
+function renderCierreHistorial(){
+  const list = [...DB.cashClosings].sort((a,b)=> b.date.localeCompare(a.date) || a.area.localeCompare(b.area));
+  const tbody = document.getElementById('cierreHistBody');
+  if(list.length===0){
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-msg">Aún no hay cierres guardados</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(c=>`
+    <tr>
+      <td>${c.date}</td>
+      <td><span class="pill ${c.area}">${catMeta[c.area]? catMeta[c.area].label : c.area}</span></td>
+      <td style="color:var(--teal-dark);font-weight:600;">${fmtMoney(c.totalIncome)}</td>
+      <td>${c.clientsCount}</td>
+      <td>${c.commissionPct}%</td>
+      <td style="color:var(--gold);font-weight:600;">${fmtMoney(c.commissionAmount)}</td>
+      <td style="font-weight:600;">${fmtMoney(c.netSalon)}</td>
+      <td>${c.closedAt}</td>
+      <td class="row-actions"><button onclick="document.getElementById('cajaFecha').value='${c.date}'; renderCaja();" title="Ver">👁</button></td>
+    </tr>
+  `).join('');
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function init(){
+  document.getElementById('ing-fecha').value = todayISO();
+  document.getElementById('gas-fecha').value = todayISO();
+  document.getElementById('cajaFecha').value = todayISO();
+  populateServiceSelect();
+  renderDashboard();
+  renderMovimientos();
+}
+init();
 </script>
-
 </body>
 </html>
