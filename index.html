@@ -465,6 +465,10 @@
                 <option value="yappy">Yappy</option>
               </select>
             </div>
+            <div id="ing-descuento-wrap" style="display:none;">
+              <label>Descuento por químicos (US$)</label>
+              <input type="number" step="0.01" min="0" id="ing-descuento" placeholder="0.00">
+            </div>
           </div>
           <div style="margin-top:14px;">
             <label>Notas (opcional)</label>
@@ -920,6 +924,8 @@ function populateServiceSelect(){
     `<option value="__custom__">Otro (personalizado)</option>`;
   const first = DB.services[cat][0];
   document.getElementById('ing-precio').value = first ? first.price : '';
+  document.getElementById('ing-descuento-wrap').style.display = (cat==='estilista') ? 'block' : 'none';
+  if(cat!=='estilista') document.getElementById('ing-descuento').value = '';
 }
 document.getElementById('ing-categoria').addEventListener('change', populateServiceSelect);
 document.getElementById('ing-servicio').addEventListener('change', e=>{
@@ -957,6 +963,7 @@ document.getElementById('formIngreso').addEventListener('submit', e=>{
     client: document.getElementById('ing-cliente').value.trim(),
     price: parseFloat(document.getElementById('ing-precio').value)||0,
     payment: document.getElementById('ing-pago').value,
+    discount: catSel==='estilista' ? (parseFloat(document.getElementById('ing-descuento').value)||0) : 0,
     notes: document.getElementById('ing-notas').value.trim()
   };
   if(editId){
@@ -1023,6 +1030,7 @@ function editIncome(id){
   document.getElementById('ing-cliente').value = rec.client;
   document.getElementById('ing-precio').value = rec.price;
   document.getElementById('ing-pago').value = rec.payment;
+  if(rec.category==='estilista') document.getElementById('ing-descuento').value = rec.discount||'';
   document.getElementById('ing-notas').value = rec.notes||'';
   document.getElementById('ing-cancel').style.display='inline-block';
   document.getElementById('mv-form-card').scrollIntoView({behavior:'smooth'});
@@ -1076,7 +1084,7 @@ function renderMovimientos(){
           <td>${x.serviceName}</td>
           <td>${x.client||'—'}</td>
           <td><span class="pill ${x.payment}">${x.payment}</span></td>
-          <td style="color:var(--teal-dark);font-weight:600;">+${fmtMoney(x.amount)}</td>
+          <td style="color:var(--teal-dark);font-weight:600;">+${fmtMoney(x.amount)}${x.discount>0? `<br><span style="color:var(--danger);font-weight:500;font-size:11px;">−${fmtMoney(x.discount)} químicos</span>`:''}</td>
           <td class="row-actions">
             <button onclick="editIncome('${x.id}')" title="Editar">✎</button>
             <button class="del" onclick="deleteIncome('${x.id}')" title="Eliminar">🗑</button>
@@ -1379,8 +1387,9 @@ function renderCajaAreaCards(fecha){
     const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
     const totalIn = cashIn+yappyIn;
     const clientsCount = incomes.length;
+    const totalDiscount = area==='estilista' ? incomes.reduce((s,i)=>s+Number(i.discount||0),0) : 0;
     const pct = DB.settings.commissionPct[area] ?? 0;
-    const commissionAmount = totalIn * (pct/100);
+    const commissionAmount = Math.max(0, totalIn*(pct/100) - totalDiscount);
     const netSalon = totalIn - commissionAmount;
 
     const existing = DB.cashClosings.find(c=>c.date===fecha && c.area===area);
@@ -1397,6 +1406,10 @@ function renderCajaAreaCards(fecha){
           <div class="item"><div class="k">Total ingresos</div><div class="v" style="color:var(--teal-dark);">${fmtMoney(totalIn)}</div></div>
           <div class="item"><div class="k">Clientes</div><div class="v">${clientsCount}</div></div>
         </div>
+        ${area==='estilista' ? `
+        <div class="cierre-summary" style="grid-template-columns:1fr;margin-top:10px;">
+          <div class="item"><div class="k">Descuentos por químicos</div><div class="v" id="disc-${area}" style="color:var(--danger);">−${fmtMoney(totalDiscount)}</div></div>
+        </div>` : ''}
         <div style="margin-top:14px;">
           <label>% Comisión trabajadora</label>
           <input type="number" min="0" max="100" step="0.5" id="pct-${area}" value="${pct}" oninput="updateAreaCalc('${area}','${fecha}')">
@@ -1416,8 +1429,9 @@ function renderCajaAreaCards(fecha){
 function updateAreaCalc(area, fecha){
   const incomes = DB.incomes.filter(i=>i.date===fecha && i.category===area);
   const totalIn = incomes.reduce((s,i)=>s+Number(i.price),0);
+  const totalDiscount = area==='estilista' ? incomes.reduce((s,i)=>s+Number(i.discount||0),0) : 0;
   const pct = parseFloat(document.getElementById(`pct-${area}`).value)||0;
-  const commissionAmount = totalIn * (pct/100);
+  const commissionAmount = Math.max(0, totalIn*(pct/100) - totalDiscount);
   const netSalon = totalIn - commissionAmount;
   document.getElementById(`pay-${area}`).textContent = fmtMoney(commissionAmount);
   document.getElementById(`net-${area}`).textContent = fmtMoney(netSalon);
@@ -1429,8 +1443,9 @@ function closeAreaCashRegister(fecha, area){
   const yappyIn = incomes.filter(i=>i.payment==='yappy').reduce((s,i)=>s+Number(i.price),0);
   const totalIn = cashIn+yappyIn;
   const clientsCount = incomes.length;
+  const totalDiscount = area==='estilista' ? incomes.reduce((s,i)=>s+Number(i.discount||0),0) : 0;
   const pct = parseFloat(document.getElementById(`pct-${area}`).value)||0;
-  const commissionAmount = totalIn * (pct/100);
+  const commissionAmount = Math.max(0, totalIn*(pct/100) - totalDiscount);
   const netSalon = totalIn - commissionAmount;
 
   // guarda el % como valor por defecto para la próxima vez
@@ -1443,6 +1458,7 @@ function closeAreaCashRegister(fecha, area){
     area,
     cashIncome:cashIn, yappyIncome:yappyIn, totalIncome:totalIn,
     clientsCount,
+    totalDiscount,
     commissionPct: pct,
     commissionAmount,
     netSalon,
@@ -1473,7 +1489,7 @@ function renderCierreHistorial(){
       <td style="color:var(--teal-dark);font-weight:600;">${fmtMoney(c.totalIncome)}</td>
       <td>${c.clientsCount}</td>
       <td>${c.commissionPct}%</td>
-      <td style="color:var(--gold);font-weight:600;">${fmtMoney(c.commissionAmount)}</td>
+      <td style="color:var(--gold);font-weight:600;">${fmtMoney(c.commissionAmount)}${c.totalDiscount>0? `<br><span style="color:var(--danger);font-weight:500;font-size:11px;">−${fmtMoney(c.totalDiscount)} químicos</span>`:''}</td>
       <td style="font-weight:600;">${fmtMoney(c.netSalon)}</td>
       <td>${c.closedAt}</td>
       <td class="row-actions"><button onclick="document.getElementById('cajaFecha').value='${c.date}'; renderCaja();" title="Ver">👁</button></td>
