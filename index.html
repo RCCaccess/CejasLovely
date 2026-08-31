@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --teal-dark:#0e7a6b;
@@ -360,11 +363,75 @@
     main{padding:0;}
     body{background:#fff;}
   }
+
+  /* ---------- LOGIN / AUTENTICACIÓN ---------- */
+  #loginScreen{
+    position:fixed;inset:0;z-index:500;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg,var(--teal-dark),var(--teal) 55%,var(--teal-mid));
+    padding:20px;
+  }
+  .login-card{
+    background:#fff;border-radius:var(--radius);padding:36px 32px;max-width:380px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);text-align:center;
+  }
+  .login-card h1{
+    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    font-size:22px;font-weight:600;margin:10px 0 2px;color:var(--ink);
+  }
+  .login-card .brand-script{
+    display:block;font-size:13px;color:var(--gray);margin-bottom:22px;
+  }
+  .login-card .brand-logo{margin:0 auto 4px;}
+  .login-card form{text-align:left;display:flex;flex-direction:column;gap:14px;}
+  .login-card .btn{width:100%;margin-top:6px;}
+  #loginError{
+    color:var(--danger);font-size:12.5px;min-height:16px;text-align:left;margin-top:-4px;
+  }
+  #loginSetupNotice{
+    text-align:left;font-size:12.5px;color:var(--gray);background:#fbfffe;
+    border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:16px;line-height:1.5;
+  }
+  #loginSetupNotice code{background:var(--mint);padding:1px 5px;border-radius:5px;}
+  #loginSpinner{font-size:13px;color:var(--gray);}
+  #logoutBtn{
+    background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);
+    color:#fff;border-radius:8px;padding:7px 10px;font-size:12px;width:100%;margin-top:6px;
+  }
+  #logoutBtn:hover{background:rgba(255,255,255,0.22);}
+  #syncStatus{font-size:11px;text-align:center;opacity:0.85;margin-top:2px;}
 </style>
 </head>
 <body>
 
-<div class="app">
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <img class="brand-logo" src="logo.png" alt="Cejas Lovely" onerror="this.replaceWith(fallbackLogoSVG())">
+    <h1>Cejas Lovely</h1>
+    <span class="brand-script">Panel Administrativo</span>
+
+    <div id="loginSetupNotice" style="display:none;">
+      Falta configurar Firebase. Abre el archivo, busca <code>firebaseConfig</code> cerca del inicio del script y pega ahí los datos de tu proyecto de Firebase. Mientras tanto, la app no puede guardar en la nube.
+    </div>
+
+    <form id="loginForm">
+      <div>
+        <label>Correo</label>
+        <input type="email" id="loginEmail" placeholder="tu@correo.com" required autocomplete="username">
+      </div>
+      <div>
+        <label>Contraseña</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <div id="loginError"></div>
+      <button type="submit" class="btn" id="loginSubmitBtn">Iniciar sesión</button>
+      <div id="loginSpinner" style="display:none;">Conectando…</div>
+    </form>
+  </div>
+</div>
+
+<div class="app" id="appRoot" style="display:none;">
   <aside class="sidebar">
     <div class="brand">
       <img class="brand-logo" id="brandLogo" src="logo.png" alt="Cejas Lovely" onerror="this.replaceWith(fallbackLogoSVG())">
@@ -378,7 +445,17 @@
       <button class="tab-btn" data-view="calendario">📅 &nbsp;Calendario</button>
       <button class="tab-btn" data-view="caja">🗂️ &nbsp;Cierre de Caja</button>
     </nav>
-    <div class="sidebar-footer">Cejas Lovely · Máster en Cejas<br>Datos guardados en este navegador</div>
+    <div class="sidebar-footer">
+      Cejas Lovely · Máster en Cejas<br>
+      <span id="syncStatus">☁️ Sincronizando…</span><br>
+      <span id="loggedInAs"></span>
+      <button id="logoutBtn" onclick="handleLogout()">Cerrar sesión</button>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button id="backupBtn" onclick="downloadBackup()" style="flex:1;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:8px;padding:7px 6px;font-size:11px;">⬇️ Respaldo</button>
+        <button id="restoreBtn" onclick="document.getElementById('restoreFileInput').click()" style="flex:1;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:8px;padding:7px 6px;font-size:11px;">⬆️ Restaurar</button>
+      </div>
+      <input type="file" id="restoreFileInput" accept="application/json" style="display:none;" onchange="restoreBackup(event)">
+    </div>
   </aside>
 
   <main>
@@ -642,10 +719,36 @@
 <script>
 /* =========================================================
    CEJAS LOVELY — PANEL ADMINISTRATIVO
-   Almacenamiento: localStorage (un solo dispositivo/navegador)
+   Almacenamiento: Firestore (nube, todos los dispositivos) con
+   localStorage como copia de respaldo/offline.
    ========================================================= */
 
 const STORAGE_KEY = 'cejasLovelyData_v1';
+
+/* ======= CONFIGURA TU FIREBASE AQUÍ =======
+   Sigue la guía FIREBASE-SETUP.md para crear el proyecto gratuito,
+   luego pega aquí el "firebaseConfig" que te da la consola de Firebase.
+   Mientras esto tenga los valores de ejemplo, la app funciona solo en
+   este dispositivo (como antes), sin pedir usuario/contraseña.
+============================================ */
+const firebaseConfig = {
+  apiKey: "PEGA_AQUI_TU_API_KEY",
+  authDomain: "PEGA_AQUI_TU_AUTH_DOMAIN",
+  projectId: "PEGA_AQUI_TU_PROJECT_ID",
+  storageBucket: "PEGA_AQUI_TU_STORAGE_BUCKET",
+  messagingSenderId: "PEGA_AQUI_TU_SENDER_ID",
+  appId: "PEGA_AQUI_TU_APP_ID"
+};
+const FIREBASE_READY = !!(firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('PEGA_AQUI'));
+
+let auth = null, firestore = null, DOC_REF = null, unsubscribeSnapshot = null, appInitialized = false;
+
+if(FIREBASE_READY){
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  firestore = firebase.firestore();
+  DOC_REF = firestore.collection('salon').doc('main');
+}
 
 function fallbackLogoSVG(){
   const div = document.createElement('div');
@@ -726,26 +829,166 @@ function defaultData(){
   };
 }
 
-function loadData(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) { const d = defaultData(); saveData(d); return d; }
-    const d = JSON.parse(raw);
-    // migración: agregar settings si vienen de una versión anterior
-    if(!d.settings) d.settings = { commissionPct: { cejas:0, estilista:0, manicurista:0 } };
-    if(!d.settings.commissionPct) d.settings.commissionPct = { cejas:0, estilista:0, manicurista:0 };
-    ['cejas','estilista','manicurista'].forEach(a=>{
-      if(typeof d.settings.commissionPct[a] !== 'number') d.settings.commissionPct[a] = 0;
-    });
-    return d;
-  }catch(e){
-    console.error('Error leyendo datos, restaurando por defecto', e);
-    const d = defaultData(); saveData(d); return d;
+// completa datos que falten (por versiones anteriores) sin importar el origen (nube o local)
+function migrateData(d){
+  if(!d || typeof d!=='object') d = defaultData();
+  if(!d.services) d.services = defaultData().services;
+  if(!d.incomes) d.incomes = [];
+  if(!d.expenses) d.expenses = [];
+  if(!d.appointments) d.appointments = [];
+  if(!d.cashClosings) d.cashClosings = [];
+  if(!d.settings) d.settings = { commissionPct: { cejas:0, estilista:0, manicurista:0 } };
+  if(!d.settings.commissionPct) d.settings.commissionPct = { cejas:0, estilista:0, manicurista:0 };
+  ['cejas','estilista','manicurista'].forEach(a=>{
+    if(typeof d.settings.commissionPct[a] !== 'number') d.settings.commissionPct[a] = 0;
+  });
+  return d;
+}
+
+let DB = null;
+
+function setSyncStatus(text){
+  const el = document.getElementById('syncStatus');
+  if(el) el.textContent = text;
+}
+
+function saveData(d){
+  DB = d;
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }catch(e){ console.error(e); }
+  if(FIREBASE_READY && DOC_REF){
+    setSyncStatus('☁️ Guardando…');
+    DOC_REF.set(d)
+      .then(()=> setSyncStatus('☁️ Sincronizado'))
+      .catch(err=>{
+        console.error('Error guardando en la nube', err);
+        setSyncStatus('⚠️ Sin conexión — guardado solo en este dispositivo');
+        toast('⚠️ No se pudo sincronizar con la nube (revisa tu conexión)');
+      });
   }
 }
-function saveData(d){ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
 
-let DB = loadData();
+function renderCurrentView(){
+  const activeBtn = document.querySelector('.tab-btn.active');
+  if(!activeBtn) return;
+  const view = activeBtn.dataset.view;
+  if(view==='dashboard') renderDashboard();
+  if(view==='movimientos') renderMovimientos();
+  if(view==='servicios') renderServicios();
+  if(view==='calendario') renderCalendario();
+  if(view==='caja') renderCaja();
+}
+
+function startCloudSync(){
+  unsubscribeSnapshot = DOC_REF.onSnapshot(docSnap=>{
+    if(docSnap.exists){
+      DB = migrateData(docSnap.data());
+    } else {
+      // Firestore está vacío (primera vez): usa lo que ya había en este navegador
+      // en vez de empezar en blanco, para no perder datos ya cargados.
+      const cachedRaw = localStorage.getItem(STORAGE_KEY);
+      DB = cachedRaw ? migrateData(JSON.parse(cachedRaw)) : defaultData();
+      DOC_REF.set(DB);
+      if(cachedRaw) toast('☁️ Se subieron tus datos guardados a la nube');
+    }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); }catch(e){}
+    setSyncStatus('☁️ Sincronizado');
+    if(!appInitialized){ appInitialized = true; initApp(); }
+    else { renderCurrentView(); }
+  }, err=>{
+    console.error('Error de sincronización', err);
+    setSyncStatus('⚠️ Sin conexión — usando copia local');
+    if(!appInitialized){
+      const cached = localStorage.getItem(STORAGE_KEY);
+      DB = migrateData(cached ? JSON.parse(cached) : defaultData());
+      appInitialized = true;
+      initApp();
+    }
+  });
+}
+
+function loadLocalOnly(){
+  // Firebase no configurado todavía: la app funciona solo en este dispositivo, sin login.
+  const raw = localStorage.getItem(STORAGE_KEY);
+  DB = migrateData(raw ? JSON.parse(raw) : defaultData());
+  setSyncStatus('💻 Solo en este dispositivo (Firebase no configurado)');
+  document.getElementById('loggedInAs').textContent = '';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'grid';
+  appInitialized = true;
+  initApp();
+}
+
+/* ---------------- LOGIN ---------------- */
+document.getElementById('loginForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  document.getElementById('loginSpinner').style.display = 'block';
+  document.getElementById('loginSubmitBtn').disabled = true;
+  auth.signInWithEmailAndPassword(email, password)
+    .catch(err=>{
+      console.error(err);
+      const map = {
+        'auth/invalid-email':'Correo inválido.',
+        'auth/user-not-found':'Ese usuario no existe.',
+        'auth/wrong-password':'Contraseña incorrecta.',
+        'auth/invalid-credential':'Correo o contraseña incorrectos.',
+        'auth/too-many-requests':'Demasiados intentos. Espera unos minutos.'
+      };
+      errEl.textContent = map[err.code] || 'No se pudo iniciar sesión. Intenta de nuevo.';
+    })
+    .finally(()=>{
+      document.getElementById('loginSpinner').style.display = 'none';
+      document.getElementById('loginSubmitBtn').disabled = false;
+    });
+});
+
+function handleLogout(){
+  if(!confirm('¿Cerrar sesión?')) return;
+  if(unsubscribeSnapshot){ unsubscribeSnapshot(); unsubscribeSnapshot = null; }
+  appInitialized = false;
+  auth.signOut();
+}
+
+/* ---------------- RESPALDO MANUAL (descargar / restaurar) ---------------- */
+function downloadBackup(){
+  if(!DB){ toast('Todavía no hay datos cargados'); return; }
+  const blob = new Blob([JSON.stringify(DB, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cejaslovely-respaldo-${todayISO()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('⬇️ Respaldo descargado');
+}
+
+function restoreBackup(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const parsed = JSON.parse(e.target.result);
+      const restored = migrateData(parsed);
+      if(!confirm('Esto reemplazará TODOS los datos actuales (ingresos, gastos, servicios, citas y cierres) con los del archivo de respaldo. ¿Continuar?')) return;
+      saveData(restored);
+      renderCurrentView();
+      toast('⬆️ Respaldo restaurado correctamente');
+    }catch(err){
+      console.error(err);
+      alert('El archivo no es un respaldo válido de Cejas Lovely.');
+    }finally{
+      event.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
 
 function toast(msg){
   const t = document.getElementById('toast');
@@ -1500,7 +1743,7 @@ function renderCierreHistorial(){
 /* =========================================================
    INIT
    ========================================================= */
-function init(){
+function initApp(){
   document.getElementById('ing-fecha').value = todayISO();
   document.getElementById('gas-fecha').value = todayISO();
   document.getElementById('cajaFecha').value = todayISO();
@@ -1508,7 +1751,27 @@ function init(){
   renderDashboard();
   renderMovimientos();
 }
-init();
+
+/* ---------------- ARRANQUE ---------------- */
+if(FIREBASE_READY){
+  auth.onAuthStateChanged(user=>{
+    if(user){
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appRoot').style.display = 'grid';
+      document.getElementById('loggedInAs').textContent = user.email;
+      startCloudSync();
+    } else {
+      document.getElementById('appRoot').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('loginError').textContent = '';
+      if(unsubscribeSnapshot){ unsubscribeSnapshot(); unsubscribeSnapshot = null; }
+      appInitialized = false;
+      DB = null;
+    }
+  });
+} else {
+  loadLocalOnly();
+}
 </script>
 </body>
 </html>
